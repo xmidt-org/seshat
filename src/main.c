@@ -64,7 +64,8 @@ int main( int argc, char **argv)
     int options_index = 0;
     int str_len = 0;
     
-    // AddMe: init_signal_handlers();
+    init_signal_handler();
+    
     while (-1 != (item = getopt_long(argc, argv, OPTIONS_STRING_FORMAT,
                          command_line_options, &options_index)))
     {
@@ -164,3 +165,4 @@ void _exit_process_(int signum)
   signal(signum, SIG_DFL);
   kill(getpid(), signum);
 }
+
