@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <assert.h>
+#include <getopt.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
 #include "wrp-c.h"
