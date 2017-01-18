@@ -51,14 +51,13 @@ static struct option command_line_options[] = {
 static char *file_name = NULL;
 static char *url = NULL;
 
-/*----------------------------------------------------------------------------*/
-/*                             Function Prototypes                            */
-/*----------------------------------------------------------------------------*/
-/* none */
+static void __sig_handler(int sig);
+static void init_signal_handler(void);
+static void _exit_process_(int signum);
 
-/*----------------------------------------------------------------------------*/
-/*                             External Functions                             */
-/*----------------------------------------------------------------------------*/
+
+
+
 int main( int argc, char **argv)
 {
     int item;
@@ -103,7 +102,65 @@ int main( int argc, char **argv)
     return 0;
 }
 
-/*----------------------------------------------------------------------------*/
-/*                             Internal functions                             */
-/*----------------------------------------------------------------------------*/
-/* none */
+
+void init_signal_handler(void)
+{
+      signal(SIGTERM, __sig_handler);
+      signal(SIGINT, __sig_handler);
+      signal(SIGUSR1, __sig_handler);
+      signal(SIGUSR2, __sig_handler);
+      signal(SIGSEGV, __sig_handler);
+      signal(SIGBUS, __sig_handler);
+      signal(SIGKILL, __sig_handler);
+      signal(SIGFPE, __sig_handler);
+      signal(SIGILL, __sig_handler);
+      signal(SIGQUIT, __sig_handler);
+      signal(SIGHUP, __sig_handler);
+      signal(SIGALRM, __sig_handler);
+}
+
+
+void __sig_handler(int sig)
+{
+
+    if ( sig == SIGINT ) {
+        signal(SIGINT, __sig_handler); /* reset it to this function */
+        printf("seshat SIGINT received!\n");
+        _exit_process_(sig);
+    }
+    else if ( sig == SIGUSR1 ) {
+        signal(SIGUSR1, __sig_handler); /* reset it to this function */
+        printf("WEBPA SIGUSR1 received!\n");
+    }
+    else if ( sig == SIGUSR2 ) {
+        printf("seshat SIGUSR2 received!\n");
+    }
+    else if ( sig == SIGCHLD ) {
+        signal(SIGCHLD, __sig_handler); /* reset it to this function */
+        printf("seshat SIGHLD received!\n");
+    }
+    else if ( sig == SIGPIPE ) {
+        signal(SIGPIPE, __sig_handler); /* reset it to this function */
+        printf("seshat SIGPIPE received!\n");
+    }
+    else if ( sig == SIGALRM ) {
+        signal(SIGALRM, __sig_handler); /* reset it to this function */
+        printf("seshat SIGALRM received!\n");
+    }
+    else if( sig == SIGTERM ) {
+      //  signal(SIGTERM, __terminate_listener);
+        printf("seshat SIGTERM received!\n");
+        _exit_process_(sig);
+    }
+    else {
+        printf("seshat Signal %d received!\n", sig);
+        _exit_process_(sig);
+    }
+}
+
+void _exit_process_(int signum)
+{
+  printf("seshat ready to exit!\n");
+  signal(signum, SIG_DFL);
+  kill(getpid(), signum);
+}
