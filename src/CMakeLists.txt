@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 set(PROJ_WRPC seshat)
+set(SOURCES main.c nmsg.c)
 
 add_executable(seshat ${SOURCES})
 
