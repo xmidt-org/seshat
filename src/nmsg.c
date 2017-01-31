@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
+#include "nmsg.h"
 
 #define SOCK_SEND_TIMEOUT_MS 2000
 
