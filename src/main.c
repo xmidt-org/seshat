@@ -26,6 +26,7 @@
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
 #include "wrp-c.h"
+#include "nmsg.h"
 
 
 /*----------------------------------------------------------------------------*/
@@ -55,6 +56,7 @@ static void __sig_handler(int sig);
 static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
+int recv_socket;
 
 
 
@@ -92,6 +94,11 @@ int main( int argc, char **argv)
          free(file_name);
      }
      exit(-1);
+    } else {
+        if ( -1 == (recv_socket = connect_receiver(url)) ) {
+            printf("Failed top open a listener socket on %s\n", url);
+            exit (-2);
+        }
     }
     
     if (NULL == file_name) {
@@ -100,6 +107,8 @@ int main( int argc, char **argv)
     
     // AddMe: start working!
     
+    
+    shutdown_receiver(recv_socket);
     return 0;
 }
 
