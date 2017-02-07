@@ -29,7 +29,6 @@ file(MAKE_DIRECTORY ${TEST_RESULTS_DIR})
 
 include_directories(${INCLUDE_DIR}
                     ${INCLUDE_DIR}/cjson
-                    ${INCLUDE_DIR}/nopoll
                     ${INCLUDE_DIR}/msgpack
                     ${INCLUDE_DIR}/trower-base64
                     ${INCLUDE_DIR}/wrp-c

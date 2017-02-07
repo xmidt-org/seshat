@@ -22,7 +22,6 @@ target_link_libraries (seshat
     -lwrp-c
     -lmsgpackc
     -ltrower-base64
-    -lnopoll
     -lm
     -lnanomsg
     -lcjson
