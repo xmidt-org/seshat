@@ -56,7 +56,7 @@ static void __sig_handler(int sig);
 static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
-int recv_socket;
+int recv_socket, send_socket;
 
 
 
@@ -99,6 +99,11 @@ int main( int argc, char **argv)
             printf("Failed top open a listener socket on %s\n", url);
             exit (-2);
         }
+        if ( -1 == (send_socket = connect_sender(url))) {
+             printf("Failed top open a sender socket on %s\n", url);
+             shutdown_receiver(send_socket);
+             exit (-3);
+        }
     }
     
     if (NULL == file_name) {
@@ -111,15 +116,20 @@ int main( int argc, char **argv)
         char *bytes = receive_msg (recv_socket, &bytes_received);
         
         if (NULL != bytes) {
+            // wrp_msg_t *msg;
+            // if (0 < wrp_to_struct( bytes, bytes_received, WRP_BYTES, &msg )) {...}
+            // log the message in the file?
+            //
             // respond_to_message(send_socket, bytes, received_bytes);
             nn_freemsg(bytes);
         }
-        
-        
     }
     
     shutdown_receiver(recv_socket);
-    return 0;
+    shutdown_receiver(send_socket);
+    // fclose(file_handle);)
+
+   return 0;
 }
 
 
