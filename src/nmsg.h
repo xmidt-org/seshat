@@ -10,7 +10,7 @@ int connect_sender (char *url);
 void shutdown_receiver (int sock);
 void shutdown_sender (int sock);
     
-char *receive_msg (int sock);
+char *receive_msg (int sock, int *number_of_bytes);
 int send_msg (const char *msg, int sock);
    
     

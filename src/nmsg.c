@@ -91,18 +91,20 @@ void shutdown_sender (int sock)
 
 
 // returned msg must be freed with nn_freemsg
-char *receive_msg (int sock)
+char *receive_msg (int sock, int *bytes)
 {
-	char *buf = NULL;
-	int bytes;
-  bytes = nn_recv (sock, &buf, NN_MSG, 0);
+  char *buf = NULL;
+    
+  *bytes = nn_recv (sock, &buf, NN_MSG, 0);
 
-  if (bytes < 0) { 
+  if (*bytes < 0) { 
 		printf ("Error receiving msg: %s\n", strerror_r (errno, errbuf, 100));
 		return NULL;
-	}
-	printf ("RECEIVED \"%s\"\n", buf);
-	return buf;
+    }
+  
+    printf ("RECEIVED %d bytes: \"%s\"\n", *bytes, buf);
+
+    return buf;
 }
 
 int send_msg (const char *msg, int sock)

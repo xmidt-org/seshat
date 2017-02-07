@@ -106,7 +106,17 @@ int main( int argc, char **argv)
     }
     
     // AddMe: start working!
-    
+    while (1) {
+        int bytes_received = 0;
+        char *bytes = receive_msg (recv_socket, &bytes_received);
+        
+        if (NULL != bytes) {
+            // respond_to_message(send_socket, bytes, received_bytes);
+            nn_freemsg(bytes);
+        }
+        
+        
+    }
     
     shutdown_receiver(recv_socket);
     return 0;
