@@ -60,7 +60,7 @@ static void __sig_handler(int sig);
 static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
-int recv_socket, send_socket;
+int recv_socket; //, send_socket;
 
 
 
@@ -103,11 +103,12 @@ int main( int argc, char **argv)
             printf("Failed top open a listener socket on %s\n", url);
             exit (-2);
         }
-        if ( -1 == (send_socket = connect_sender(url))) {
-             printf("Failed top open a sender socket on %s\n", url);
-             shutdown_receiver(send_socket);
-             exit (-3);
-        }
+        //?????????????? send-to needs to be defined ????????????
+        //if ( -1 == (send_socket = connect_sender(url))) {
+        //     printf("Failed top open a sender socket on %s\n", url);
+        //     shutdown_receiver(send_socket);
+        //     exit (-3);
+        //}
     }
     
     if (NULL == file_name) {
