@@ -99,16 +99,16 @@ int main( int argc, char **argv)
      }
      exit(-1);
     } else {
-        if ( -1 == (recv_socket = connect_receiver(url)) ) {
-            printf("Failed top open a listener socket on %s\n", url);
+        recv_socket = nn_socket (AF_SP, NN_REP);
+        if ( -1 == recv_socket) {
+            printf("Failed to open a listener socket on %s\n", url);
             exit (-2);
+        } else if (0 > nn_bind(recv_socket, url)) {
+            printf("Failed to bind listener socket on %s\n", url);
+            shutdown_receiver(recv_socket);
+            exit (-3);            
         }
-        //?????????????? send-to needs to be defined ????????????
-        //if ( -1 == (send_socket = connect_sender(url))) {
-        //     printf("Failed top open a sender socket on %s\n", url);
-        //     shutdown_receiver(send_socket);
-        //     exit (-3);
-        //}
+        printf("Socket %d set to listen to %s\n", recv_socket, url);
     }
     
     if (NULL == file_name) {
@@ -131,7 +131,7 @@ int main( int argc, char **argv)
     }
     
     shutdown_receiver(recv_socket);
-    shutdown_receiver(send_socket);
+   // shutdown_receiver(send_socket);
     // fclose(file_handle);)
 
    return 0;

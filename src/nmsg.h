@@ -4,6 +4,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <nanomsg/nn.h>
+#include <nanomsg/reqrep.h>
     
 int connect_receiver (char *url);
 int connect_sender (char *url);
