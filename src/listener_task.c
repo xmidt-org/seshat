@@ -5,7 +5,7 @@
 
 static pthread_t thread_id;
 
-static void listener(void *data);
+static void *listener(void *data);
 static listener_data_t the_data;
 int listener_thread_start(listener_data_t *data)
 {
@@ -14,7 +14,7 @@ int listener_thread_start(listener_data_t *data)
 }
 
 
-void listener(void *data)
+void *listener(void *data)
 {
     (void ) data;
     while (1) {
@@ -22,4 +22,5 @@ void listener(void *data)
         printf("listener running\n");
     }
     
+    return NULL;
 }
