@@ -123,7 +123,7 @@ int main( int argc, char **argv)
     the_data.url = url;
     the_data.file_handle = file_handle;
             
-    listener_thread_start(recv_socket);
+    listener_thread_start(&the_data);
     
     // AddMe: start working!
     while (1) {
