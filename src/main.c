@@ -27,6 +27,7 @@
 #include <nanomsg/pipeline.h>
 #include "wrp-c.h"
 #include "nmsg.h"
+#include "listener_task.h"
 
 void __attribute__((weak)) __cimplog(const char *module, int level, const char *msg, ...);
 
@@ -62,13 +63,14 @@ static void _exit_process_(int signum);
 
 int recv_socket; //, send_socket;
 
-
+listener_data_t the_data;
 
 int main( int argc, char **argv)
 {
     int item;
     int options_index = 0;
     int str_len = 0;
+    FILE *file_handle;
     
     init_signal_handler();
     
@@ -115,24 +117,34 @@ int main( int argc, char **argv)
         file_name = "/tmp/seshat_services";
     }
     
+    file_handle = fopen(file_name, "w");
+    
+    the_data.socket = recv_socket;
+    the_data.url = url;
+    the_data.file_handle = file_handle;
+            
+    listener_thread_start(recv_socket);
+    
     // AddMe: start working!
     while (1) {
-        int bytes_received = 0;
-        char *bytes = receive_msg (recv_socket, &bytes_received);
         
-        if (NULL != bytes) {
+        printf("main() waiting ...\n");
+        sleep(15);
+        //int bytes_received = 0;
+        //char *bytes = receive_msg (recv_socket, &bytes_received);
+        
+        //if (NULL != bytes) {
             // wrp_msg_t *msg;
             // if (0 < wrp_to_struct( bytes, bytes_received, WRP_BYTES, &msg )) {...}
             // log the message in the file?
             //
             // respond_to_message(send_socket, bytes, received_bytes);
-            nn_freemsg(bytes);
-        }
+          //  nn_freemsg(bytes);
+        //}
     }
     
     shutdown_receiver(recv_socket);
-   // shutdown_receiver(send_socket);
-    // fclose(file_handle);)
+    fclose(file_handle);
 
    return 0;
 }
