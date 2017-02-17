@@ -24,6 +24,7 @@ void *listener(void *data)
         if (bytes > 0) {
              printf("listener got %d bytes\n", bytes);
            //Parse message and send response
+           // nn_send(socket?, response_code, size);
         } else {
             printf("listener timed out\n");
             
