@@ -71,6 +71,7 @@ int main( int argc, char **argv)
     int options_index = 0;
     int str_len = 0;
     FILE *file_handle;
+    int timeout_val;
     
     init_signal_handler();
     
@@ -110,6 +111,13 @@ int main( int argc, char **argv)
             shutdown_receiver(recv_socket);
             exit (-3);            
         }
+        
+        timeout_val = 1000; // is this ms or us ?     
+        if (0 != nn_setsockopt (recv_socket, NN_SOL_SOCKET, NN_RCVTIMEO,
+                &timeout_val, sizeof(timeout_val))) {
+            printf("Failed to set wait time out!\n");
+        }
+        
         printf("Socket %d set to listen to %s\n", recv_socket, url);
     }
     
@@ -122,7 +130,8 @@ int main( int argc, char **argv)
     the_data.socket = recv_socket;
     the_data.url = url;
     the_data.file_handle = file_handle;
-            
+
+    
     listener_thread_start(&the_data);
     
     // AddMe: start working!
