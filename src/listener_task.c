@@ -16,9 +16,19 @@ int listener_thread_start(listener_data_t *data)
 
 void *listener(void *data)
 {
-    (void ) data;
+    listener_data_t in_data = * (listener_data_t *) data;
+    char buf[NN_MSG+1];
+    
     while (1) {
-        sleep(10);
+        int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
+        if (bytes > 0) {
+             printf("listener got %d bytes\n", bytes);
+           //Parse message and send response
+        } else {
+            printf("listener timed out\n");
+            
+        }
+        sleep(5);
         printf("listener running\n");
     }
     

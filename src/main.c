@@ -112,7 +112,7 @@ int main( int argc, char **argv)
             exit (-3);            
         }
         
-        timeout_val = 1000; // is this ms or us ?     
+        timeout_val = 5000; // ms    
         if (0 != nn_setsockopt (recv_socket, NN_SOL_SOCKET, NN_RCVTIMEO,
                 &timeout_val, sizeof(timeout_val))) {
             printf("Failed to set wait time out!\n");
