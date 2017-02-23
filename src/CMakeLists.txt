@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 set(PROJ_WRPC seshat)
+set(SOURCES main.c nmsg.c listener_task.c wrp_interface.c)
 
 add_executable(seshat ${SOURCES})
 
@@ -21,7 +22,6 @@ target_link_libraries (seshat
     -lwrp-c
     -lmsgpackc
     -ltrower-base64
-    -lnopoll
     -lm
     -lnanomsg
     -lcjson

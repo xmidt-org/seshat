@@ -1,4 +1,4 @@
-#   Copyright 2010-2016 Comcast Cable Communications Management, LLC
+#   Copyright 2010-2017 Comcast Cable Communications Management, LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -119,8 +119,8 @@ endif ()
 link_directories ( ${LIBRARY_DIR} ${LIBRARY_DIR64})
 
 add_subdirectory(src)
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif (BUILD_TESTING)
+#if (BUILD_TESTING)
+#    add_subdirectory(tests)
+#endif (BUILD_TESTING)
 
 add_subdirectory(lib)
