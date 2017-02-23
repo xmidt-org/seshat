@@ -17,17 +17,21 @@ int listener_thread_start(listener_data_t *data)
 void *listener(void *data)
 {
     listener_data_t in_data = * (listener_data_t *) data;
-    char buf[NN_MSG+1];
+    char *buf = NULL;
     
     while (1) {
         int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
         if (bytes > 0) {
+            wrp_msg_t response.msg_type = WRP_MSG_TYPE__AUTH;
+            size_t resp_size = 0;
              printf("listener got %d bytes\n", bytes);
-           //Parse message and send response
-           // nn_send(socket?, response_code, size);
+             response.u.auth.status = create_response_to_message(buf, bytes);
+             nn_send(in_data.socket, &response, sizeof(wrp_msg_t));
+             free(buf);
         } else {
-            printf("listener timed out\n");
-            
+            // do we need to check for socket error other than timed out ?
+            printf("listener timed out or socket error?\n");
+            continue;
         }
         sleep(5);
         printf("listener running\n");
