@@ -23,6 +23,7 @@ target_link_libraries (seshat
     -lmsgpackc
     -ltrower-base64
     -lm
+    -lcimplog
     -lnanomsg
     -lcjson
     -lpthread

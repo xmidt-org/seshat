@@ -100,6 +100,18 @@ add_library(libmsgpack STATIC SHARED IMPORTED)
 add_dependencies(libmsgpack msgpack)
 
 
+# cimplog external dependency
+#-------------------------------------------------------------------------------
+ExternalProject_Add(cimplog
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/cimplog
+    GIT_REPOSITORY https://github.com/Comcast/cimplog.git
+    GIT_TAG "master"
+    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+)
+add_library(libcimplog STATIC SHARED IMPORTED)
+add_dependencies(libcimplog cimplog)
+
+
 # wrp-c external dependency
 #-------------------------------------------------------------------------------
 ExternalProject_Add(wrp-c

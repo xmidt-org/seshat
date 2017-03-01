@@ -29,11 +29,6 @@
 #include "nmsg.h"
 #include "listener_task.h"
 
-void __attribute__((weak)) __cimplog(const char *module, int level, const char *msg, ...);
-
-void __cimplog(const char *module, int level, const char *msg, ...) {}
-
-
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
