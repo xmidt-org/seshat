@@ -32,7 +32,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define OPTIONS_STRING_FORMAT "u:"
+#define OPTIONS_STRING_FORMAT "u:f:"
 
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
@@ -57,6 +57,16 @@ static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
 int recv_socket; //, send_socket;
+
+#define FAKE_SERVER_CODE
+#ifdef FAKE_SERVER_CODE
+#include <pthread.h>
+
+int fake_server_socket;
+listener_data_t fake_server_data;
+int fake_server_thread_start(listener_data_t *data);    
+#endif
+
 
 listener_data_t the_data;
 
@@ -96,26 +106,48 @@ int main( int argc, char **argv)
          free(file_name);
      }
      exit(-1);
-    } else {
-        recv_socket = nn_socket (AF_SP, NN_REP);
-        if ( -1 == recv_socket) {
-            printf("Failed to open a listener socket on %s\n", url);
-            exit (-2);
-        } else if (0 > nn_bind(recv_socket, url)) {
-            printf("Failed to bind listener socket on %s\n", url);
-            shutdown_receiver(recv_socket);
-            exit (-3);            
-        }
-        
-        timeout_val = 5000; // ms    
-        if (0 != nn_setsockopt (recv_socket, NN_SOL_SOCKET, NN_RCVTIMEO,
-                &timeout_val, sizeof(timeout_val))) {
-            printf("Failed to set wait time out!\n");
-        }
-        
-        printf("Socket %d set to listen to %s\n", recv_socket, url);
+    } 
+    
+    
+#ifdef FAKE_SERVER_CODE
+    fake_server_socket = nn_socket(AF_SP, NN_REP);
+    if (fake_server_socket < 0) {
+        printf("Fake Server SOcket Failed!\n");
+        exit(-11);
     }
     
+    if (nn_connect(fake_server_socket, url) < 0) {
+        printf("Fake Server connect failed!\n");
+        nn_shutdown(fake_server_socket, 0);
+        exit(-12);
+    }
+    
+    fake_server_data.socket = fake_server_socket;
+    fake_server_data.url = url;
+    fake_server_data.file_handle = NULL;   
+    
+    fake_server_thread_start(&fake_server_data);
+    
+#endif   
+
+    recv_socket = nn_socket (AF_SP, NN_REP);
+    if ( -1 == recv_socket) {
+        printf("Failed to open a listener socket on %s\n", url);
+        exit (-2);
+    } else if (0 > nn_bind(recv_socket, url)) {
+        printf("Failed to bind listener socket on %s\n", url);
+        shutdown_receiver(recv_socket);
+        exit (-3);            
+    }
+
+    timeout_val = 5000; // ms    
+    if (0 != nn_setsockopt (recv_socket, NN_SOL_SOCKET, NN_RCVTIMEO,
+            &timeout_val, sizeof(timeout_val))) {
+        printf("Failed to set wait time out!\n");
+    }
+
+    printf("Socket %d set to listen to %s\n", recv_socket, url);
+
     if (NULL == file_name) {
         file_name = "/tmp/seshat_services";
     }
@@ -126,9 +158,8 @@ int main( int argc, char **argv)
     the_data.url = url;
     the_data.file_handle = file_handle;
 
-    
     listener_thread_start(&the_data);
-    
+   
     // AddMe: start working!
     while (1) {
         
@@ -216,3 +247,40 @@ void _exit_process_(int signum)
   kill(getpid(), signum);
 }
 
+
+#ifdef FAKE_SERVER_CODE
+static pthread_t fake_thread_id;
+
+static void *fake_server(void *data);
+static listener_data_t fake_data;
+int fake_server_thread_start(listener_data_t *data)
+{
+    fake_data = *data;
+    return pthread_create(&fake_thread_id, NULL, fake_server, (void *) &fake_data);
+}
+
+
+void *fake_server(void *data)
+{
+    listener_data_t in_data = * (listener_data_t *) data;
+     
+    while (1) {
+        wrp_msg_t response;
+        response.msg_type = WRP_MSG_TYPE__AUTH;
+        response.u.auth.status = 200;
+        if (sizeof(wrp_msg_t) == nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0)) {
+            printf("Sent %d bytes\n", (int ) sizeof(wrp_msg_t));
+        }
+        else {
+            printf("Sender failed to send message\n");
+        }
+        
+        sleep(5);
+        printf("Fake Server running\n");
+    }
+    
+    return NULL;
+}
+
+
+#endif
