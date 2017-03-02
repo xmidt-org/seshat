@@ -20,6 +20,8 @@ void *listener(void *data)
     listener_data_t in_data = * (listener_data_t *) data;
     char *buf = NULL;
     
+    sleep(10);
+    
     while (1) {
         int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
         if (bytes > 0) {
@@ -28,13 +30,13 @@ void *listener(void *data)
              printf("listener got %d bytes\n", bytes);
              response.u.auth.status = create_response_to_message(buf, bytes);
              nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
-             free(buf);
+             // FixMe: data corruption or wrp_to_struct() frees this!! free(buf);
         } else {
             // do we need to check for socket error other than timed out ?
             printf("listener timed out or socket error?\n");
             continue;
         }
-        sleep(5);
+        sleep(1);
         printf("listener running\n");
     }
     
