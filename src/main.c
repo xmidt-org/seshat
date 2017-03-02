@@ -116,7 +116,7 @@ int main( int argc, char **argv)
     } 
     
 
-    recv_socket = nn_socket (AF_SP, NN_PULL);
+    recv_socket = nn_socket (AF_SP, NN_REP);
     if ( -1 == recv_socket) {
         printf("Failed to open a listener socket on %s\n", url);
         exit (-2);
@@ -149,7 +149,7 @@ int main( int argc, char **argv)
 #ifdef FAKE_SERVER_CODE
     sleep(1);
     printf("About to start the fake server\n");
-    fake_server_socket = nn_socket(AF_SP, NN_PUSH);
+    fake_server_socket = nn_socket(AF_SP, NN_REQ);
     if (fake_server_socket < 0) {
         printf("Fake Server Socket Failed!\n");
         exit(-11);
