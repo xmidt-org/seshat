@@ -44,21 +44,27 @@ void *listener(void *data)
     listener_data_t in_data = * (listener_data_t *) data;
     char *buf = NULL;
     
-    while( 1 ) {
+    sleep(10);
+    
+    while (1) {
         int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
         if( bytes > 0 ) {
             wrp_msg_t response;
+#ifndef FAKE_SERVER_CODE
             response.msg_type = WRP_MSG_TYPE__AUTH;
-            printf("listener got %d bytes\n", bytes);
-            response.u.auth.status = create_response_to_message(buf, bytes);
-            nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
-            free(buf);
+#else
+            response.msg_type = 911;            
+#endif
+             printf("listener got %d bytes\n", bytes);
+             response.u.auth.status = create_response_to_message(buf, bytes);
+             nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
+             nn_freemsg(buf);
         } else {
             // do we need to check for socket error other than timed out ?
             printf("listener timed out or socket error?\n");
             continue;
         }
-        sleep(5);
+        sleep(1);
         printf("listener running\n");
     }
     

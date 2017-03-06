@@ -5,7 +5,7 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
-   - secure: "xxx"
+   - secure: "hFwoWaec5tzfUqqydlI2w05LrM0z+dzbv4weplJXjTuuN2/Nd0WLaMrfB9N8/ph6O/g9IAHMg80fslNY41eDTRJo7bISxjGfNwwm3T76Xznj7qsNgHf6bk9b9i6YAC3Ti0DBXOURMsJHjVqoykSBBlmHD75tOW2z4hPEVaEltjSjuuq6qR17reXOUkRya6fE37+TvPgAHb6acwJidNRc3I+UrAMifBj4ZK+qXSYlfOxLTxfQu83Kk1rO2q1bEp+qZB32EWQkFRVML6ysanK2PKymN61WddvShjMZu2bIbxhnBc+jS52I0zk09InJP98eisReMVtEjpXzw6m/Ku422+N8thdJgSDF8p8xOCpd8gOmPFLmJV/gb0jwmouZu5lmCU8TrFzITJZ5nSjqzxbw1Wr8lG+XA+USBZcMv1sPqb2djZKm0kU958nbthZ+kpM4ncCM5hFI5hOT+ln5lWEpQNWYBzZq22Ldv3LStoogUrl2Yk6l17WyUipvxR5D/WaXcF3Z8pDSFSRnJ7Oc1vO1pl6EBeJxbijeCNbzM9MkWkfli0c3X6/GgpaC8Pl3S+RAicPPdWTdxJP3cjxQMzfqsWsROkmByTo2KHhDHqA4LOlSOw4RjVZu8cwcsTpC5hLIyGtdRG7JhqO93J16cFch3o/5RyG6xe4PvePHpx8+6aE="
 
 addons:
   coverity_scan:
@@ -19,6 +19,7 @@ addons:
 
 before_install:
     - sudo pip install codecov
+    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 install:
     - sudo apt-get update -qq
@@ -30,7 +31,6 @@ script:
     - cmake ..
     - make
     - make test
-    - make coverage
 
 after_success:
     - codecov

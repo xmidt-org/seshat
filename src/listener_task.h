@@ -28,4 +28,8 @@ int listener_thread_start(listener_data_t *data);
 #ifdef __cplusplus
 }
 #endif
+
+#define FAKE_SERVER_CODE
+
+
 #endif
