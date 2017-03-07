@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <stdio.h>
 #include <stdlib.h>
 #include <cJSON.h>
 
@@ -42,7 +43,7 @@ cjir_t cji_add_entry( const char *entry, const char *value, char **buffer_in_out
     }
 
     object = cJSON_GetObjectItem(root, entry);
-    if( NULL == object ) { 
+    if( NULL == object ) {
         cJSON_AddStringToObject(root, entry, value);
     } else {
         cJSON_DeleteItemFromObject(root, entry);
@@ -89,8 +90,8 @@ static void __cji_init(const char *buffer, cJSON **root)
    cJSON_InitHooks( &cjhooks );
 
    *root = cJSON_Parse(buffer);
-   if( NULL == root ) {
-       cJSON_CreateObject();
+   if( NULL == *root ) {
+       *root = cJSON_CreateObject();
    }
 }
 

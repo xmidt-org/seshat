@@ -59,7 +59,10 @@ void test_cji_add_entry()
 
     file_handle = fopen(TEST1_FILE_NAME, "w+");
     file_to_string(file_handle, &buf);
+
     cji_add_entry(TEST1_ENTRY, TEST1_VALUE, &buf);
+    printf("buf = %s\n", buf);
+
     fwrite(buf, sizeof(char), strlen(buf), file_handle);
     free(buf);
     fclose(file_handle);
