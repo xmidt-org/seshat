@@ -137,7 +137,7 @@ int main( int argc, char **argv)
         file_name = "/tmp/seshat_services";
     }
     
-    file_handle = fopen(file_name, "w");
+    file_handle = fopen(file_name, "w+");
     
     the_data.socket = recv_socket;
     the_data.url = url;

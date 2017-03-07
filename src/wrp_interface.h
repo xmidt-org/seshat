@@ -17,7 +17,7 @@ extern "C" {
 #include "wrp-c.h"
 #include "nmsg.h"
     
-size_t create_response_to_message(char *data, size_t cnt);
+size_t create_response_to_message(char *data, size_t cnt, FILE *file_handle);
 
 
 #ifdef __cplusplus

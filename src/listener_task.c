@@ -31,7 +31,7 @@ void *listener(void *data)
             response.msg_type = 911;            
 #endif
              printf("listener got %d bytes\n", bytes);
-             response.u.auth.status = create_response_to_message(buf, bytes);
+             response.u.auth.status = create_response_to_message(buf, bytes, in_data.file_handle);
              nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
              nn_freemsg(buf);
         } else {
