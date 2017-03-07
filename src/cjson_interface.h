@@ -33,8 +33,28 @@ typedef enum __cj_interface_return_type {
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
+/**
+ *  Adds JSON name value entry to the full JSON object passed in through buffer
+ *  and returned with the entry added to the buffer.
+ *
+ *  @param entry           [in]      name of the JSON entry.
+ *  @param value           [in]      value of the JSON entry.
+ *  @param buffer_in_out   [in][out] input to the JSON object and also that of the 
+ *                               JSON object with name/value pair added
+ *
+ *  @return status of add operation
+ */
 cjir_t cji_add_entry( const char *entry, const char *value, char **buffer_in_out );
 
+/**
+ *  Retrieves JSON name value entry from the full JSON object passed in through buffer.
+ *
+ *  @param entry           [in]  name of the JSON entry.
+ *  @param buffer          [in]  string buffer in which to find JSON entry.
+ *  @param entry_out       [out] retrieved JSON object. 
+ *
+ *  @return status of add operation
+ */
 cjir_t cji_retrieve_entry( const char *entry_name, const char *buffer_in, char **entry_out );
 
 #ifdef __cplusplus

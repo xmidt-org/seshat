@@ -17,6 +17,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <cJSON.h>
 
 #include <CUnit/Basic.h>
@@ -56,12 +57,19 @@ void test_cji_add_entry()
 {
     FILE *file_handle;
     char *buf;
+    char ver_buf[] = "{\
+	\"service1\":	\"url1\"\
+}";
+    cJSON *ver_buf_JSON = cJSON_CreateObject();
+    cJSON_AddItemToObject(ver_buf_JSON, "dummy", cJSON_CreateString(ver_buf));
 
     file_handle = fopen(TEST1_FILE_NAME, "w+");
     file_to_string(file_handle, &buf);
 
     cji_add_entry(TEST1_ENTRY, TEST1_VALUE, &buf);
     printf("buf = %s\n", buf);
+//    TODO: Compare cJSON objects and verify.
+//    CU_ASSERT(true == cJSON_HasObjectItem(ver_buf_JSON, buf));
 
     fwrite(buf, sizeof(char), strlen(buf), file_handle);
     free(buf);
