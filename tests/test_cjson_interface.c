@@ -56,20 +56,19 @@ size_t file_to_string( FILE *handle, char **buffer )
 void test_cji_add_entry()
 {
     FILE *file_handle;
-    char *buf;
-    char ver_buf[] = "{\
-	\"service1\":	\"url1\"\
-}";
+    char *buf; char *ver_buf;
     cJSON *ver_buf_JSON = cJSON_CreateObject();
-    cJSON_AddItemToObject(ver_buf_JSON, "dummy", cJSON_CreateString(ver_buf));
 
+    cJSON_AddStringToObject(ver_buf_JSON, TEST1_ENTRY, TEST1_VALUE);
     file_handle = fopen(TEST1_FILE_NAME, "w+");
     file_to_string(file_handle, &buf);
 
     cji_add_entry(TEST1_ENTRY, TEST1_VALUE, &buf);
     printf("buf = %s\n", buf);
-//    TODO: Compare cJSON objects and verify.
-//    CU_ASSERT(true == cJSON_HasObjectItem(ver_buf_JSON, buf));
+
+    ver_buf = cJSON_Print(ver_buf_JSON);
+    printf("ver_buf = %s\n", ver_buf);
+    CU_ASSERT(0 == strcmp(ver_buf, buf));
 
     fwrite(buf, sizeof(char), strlen(buf), file_handle);
     free(buf);
