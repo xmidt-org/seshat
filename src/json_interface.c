@@ -71,9 +71,7 @@ jir_t ji_add_entry( const char *entry, const char *value )
             else
             {
                 free(current->value);
-                current->value = (char *) malloc( value_len + 1 );
-                strncpy( current->value, value, (value_len + 1) ); 
-                current->value[value_len] = '\0';
+                current->value = strdup(value); 
                 return __ji_persist();
             }
         }
@@ -81,13 +79,8 @@ jir_t ji_add_entry( const char *entry, const char *value )
     }
 
     current = (ji_ll_t *) malloc( sizeof(ji_ll_t) );
-    current->entry = (char *) malloc( entry_len + 1 );
-    current->value = (char *) malloc( value_len + 1 );
-
-    strncpy( current->entry, entry, entry_len );
-    current->entry[entry_len] = '\0';
-    strncpy( current->value, value, value_len );
-    current->value[value_len] = '\0';
+    current->entry = strdup(entry);
+    current->value = strdup(value);
     current->next = NULL;
 
     if( NULL == head ) {
