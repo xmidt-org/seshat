@@ -179,7 +179,7 @@ static char *__ji_cjson_create(ji_ll_t *node)
     cJSON_AddItemToObject(root, node->entry, service);
     cJSON_AddStringToObject(service, ITEM, node->value);
 
-    buf = cJSON_Print(service);
+    buf = cJSON_Print(root);
     cJSON_Delete(root);
     return buf;
 }
