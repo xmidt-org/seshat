@@ -57,6 +57,7 @@ static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
 int recv_socket; //, send_socket;
+FILE *g_file_handle = NULL; // ***Temporary***/
 
 #ifdef FAKE_SERVER_CODE
 
@@ -80,7 +81,6 @@ int main( int argc, char **argv)
     int item;
     int options_index = 0;
     int str_len = 0;
-    FILE *file_handle;
     int timeout_val;
     int nn_err;
     
@@ -137,11 +137,11 @@ int main( int argc, char **argv)
         file_name = "/tmp/seshat_services";
     }
     
-    file_handle = fopen(file_name, "w");
+    g_file_handle = fopen(file_name, "w");
     
     the_data.socket = recv_socket;
     the_data.url = url;
-    the_data.file_handle = file_handle;
+    the_data.file_handle = g_file_handle;
 
     listener_thread_start(&the_data);   
         
@@ -193,7 +193,7 @@ int main( int argc, char **argv)
     }
     
     shutdown_receiver(recv_socket);
-    fclose(file_handle);
+    fclose(g_file_handle);
 
    return 0;
 }
