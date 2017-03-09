@@ -87,8 +87,7 @@ int main( int argc, char **argv)
                 memset(url, 0, str_len);
                 strncpy(url, optarg, str_len);
                 break;
-        }
-        
+        }    
     }
     
     if (NULL == url) {
@@ -103,10 +102,12 @@ int main( int argc, char **argv)
     recv_socket = nn_socket (AF_SP, NN_REP);
     if ( -1 == recv_socket) {
         printf("Failed to open a listener socket on %s\n", url);
+        free(url);
         exit (-2);
     } else if (0 > (nn_err = nn_bind(recv_socket, url))) {
         printf("Failed to bind listener socket on %s, %d\n", url, nn_err);
         shutdown_receiver(recv_socket);
+        free(url);
         exit (-3);            
     }
 
@@ -138,6 +139,7 @@ int main( int argc, char **argv)
     
     shutdown_receiver(recv_socket);
     fclose(file_handle);
+    free(url);
 
    return 0;
 }
