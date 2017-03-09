@@ -14,10 +14,26 @@
 
 set(PROJ_WRPC seshat)
 set(SOURCES main.c nmsg.c listener_task.c wrp_interface.c)
+set(FAKE_SERVER_SOURCES fake_server.c)
 
 add_executable(seshat ${SOURCES})
+add_executable(fake_server ${FAKE_SERVER_SOURCES})
 
 target_link_libraries (seshat
+    ${CMAKE_THREAD_LIBS_INIT}
+    -lwrp-c
+    -lmsgpackc
+    -ltrower-base64
+    -lm
+    -lcimplog
+    -lnanomsg
+    -lcjson
+    -lpthread
+    -lrt
+    )
+
+
+target_link_libraries (fake_server
     ${CMAKE_THREAD_LIBS_INIT}
     -lwrp-c
     -lmsgpackc

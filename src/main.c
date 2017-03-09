@@ -58,21 +58,6 @@ static void _exit_process_(int signum);
 
 int recv_socket; //, send_socket;
 
-#ifdef FAKE_SERVER_CODE
-
-/*
- * For some reason '///' is required otherwise I gt a bind error ;-(/!
- ./seshat -f foo.txt -u ipc:///tmp/foo.ipc
- */
-
-#include <pthread.h>
-
-int fake_server_socket;
-listener_data_t fake_server_data;
-int fake_server_thread_start(listener_data_t *data);    
-#endif
-
-
 listener_data_t the_data;
 
 int main( int argc, char **argv)
@@ -102,8 +87,7 @@ int main( int argc, char **argv)
                 memset(url, 0, str_len);
                 strncpy(url, optarg, str_len);
                 break;
-        }
-        
+        }    
     }
     
     if (NULL == url) {
@@ -118,10 +102,12 @@ int main( int argc, char **argv)
     recv_socket = nn_socket (AF_SP, NN_REP);
     if ( -1 == recv_socket) {
         printf("Failed to open a listener socket on %s\n", url);
+        free(url);
         exit (-2);
     } else if (0 > (nn_err = nn_bind(recv_socket, url))) {
         printf("Failed to bind listener socket on %s, %d\n", url, nn_err);
         shutdown_receiver(recv_socket);
+        free(url);
         exit (-3);            
     }
 
@@ -145,55 +131,15 @@ int main( int argc, char **argv)
 
     listener_thread_start(&the_data);   
         
-#ifdef FAKE_SERVER_CODE
-    sleep(1);
-    printf("About to start the fake server\n");
-    fake_server_socket = nn_socket(AF_SP, NN_REQ);
-    if (fake_server_socket < 0) {
-        printf("Fake Server Socket Failed!\n");
-        exit(-11);
-    }
-
-    timeout_val = 100000; // ms    
-    if (0 != nn_setsockopt (fake_server_socket, NN_SOL_SOCKET, NN_RCVTIMEO,
-            &timeout_val, sizeof(timeout_val))) {
-        printf("fake_server_socket: Failed to set wait time out!\n");
-    }    
-    
-    if (nn_connect(fake_server_socket, url) < 0) {
-        printf("Fake Server connect failed!\n");
-        nn_shutdown(fake_server_socket, 0);
-        exit(-12);
-    }
-    
-    fake_server_data.socket = fake_server_socket;
-    fake_server_data.url = url;
-    fake_server_data.file_handle = NULL;   
-    
-    fake_server_thread_start(&fake_server_data);
-    
-#endif   
-    
-    // AddMe: start working!
     while (1) {
         
         printf("main() waiting ...\n");
         sleep(15);
-        //int bytes_received = 0;
-        //char *bytes = receive_msg (recv_socket, &bytes_received);
-        
-        //if (NULL != bytes) {
-            // wrp_msg_t *msg;
-            // if (0 < wrp_to_struct( bytes, bytes_received, WRP_BYTES, &msg )) {...}
-            // log the message in the file?
-            //
-            // respond_to_message(send_socket, bytes, received_bytes);
-          //  nn_freemsg(bytes);
-        //}
     }
     
     shutdown_receiver(recv_socket);
     fclose(file_handle);
+    free(url);
 
    return 0;
 }
@@ -260,88 +206,3 @@ void _exit_process_(int signum)
   signal(signum, SIG_DFL);
   kill(getpid(), signum);
 }
-
-
-#ifdef FAKE_SERVER_CODE
-static pthread_t fake_thread_id;
-
-static void *fake_server(void *data);
-static listener_data_t fake_data;
-
-int server_listener_thread_start(listener_data_t *data);
-static void *server_listener(void *data);
-static listener_data_t server_listener_data;
-static pthread_t server_listener_thread_id;
-
-
-int fake_server_thread_start(listener_data_t *data)
-{
-    fake_data = *data;
-    return pthread_create(&fake_thread_id, NULL, fake_server, (void *) &fake_data);
-}
-
-
-void *fake_server(void *data)
-{
-    listener_data_t in_data = * (listener_data_t *) data;
-    
-    server_listener_thread_start((listener_data_t *) data);   
-    
-    while (1) {
-        wrp_msg_t *response = (wrp_msg_t *) malloc(sizeof(wrp_msg_t));
-        int bytes_sent;
-        response->msg_type = WRP_MSG_TYPE__AUTH;
-        response->u.auth.status = 200;
-        if ((bytes_sent =  nn_send(in_data.socket, response, sizeof(wrp_msg_t), 0)) > 0) {
-            printf("Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) sizeof(wrp_msg_t));
-        }
-        else {
-            printf("Sender failed to send message\n");
-        }
-        // FixMe: Add a thread to listen to response if any
-        {
-        //    char *buf = (char *) malloc(1024 * 20);
-        //    nn_recv(in_data.socket, buf, NN_MSG, 0);
-        // ......
-        //    free(buf);
-        }
-        sleep(5);
-        printf("Fake Server running\n");
-    }
-    
-    return NULL;
-}
-
-
-int server_listener_thread_start(listener_data_t *data)
-{
-    server_listener_data = *data;
-    return pthread_create(&server_listener_thread_id, NULL, server_listener, (void *) &server_listener_data);
-}
-
-void *server_listener(void *data)
-{
-    listener_data_t in_data = * (listener_data_t *) data;
-    char *buf = NULL;
-    
-    sleep(10);
-    
-    while (1) {
-        int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
-        if (bytes > 0) {
-            wrp_msg_t response = *(wrp_msg_t *) buf;
-            printf("Server Listener Got reply: %d bytes, response %d\n",
-                    bytes, response.msg_type);
-            nn_freemsg(buf);
-        } else {
-            // do we need to check for socket error other than timed out ?
-            printf("server_listener timed out or socket error?\n");
-        }
-        sleep(3);
-        printf("server_listener running\n");
-    }
-    
-    return NULL;
-}
-
-#endif  // FAKE_SERVER_CODE
