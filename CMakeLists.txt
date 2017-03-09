@@ -55,7 +55,7 @@ ExternalProject_Add(trower-base64
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/trower-base64
     GIT_REPOSITORY https://github.com/Comcast/trower-base64.git
     GIT_TAG "master"
-    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DBUILD_TESTING=OFF
 )
 add_library(libtrower-base64 STATIC SHARED IMPORTED)
 add_dependencies(libtrower-base64 trower-base64)
@@ -67,7 +67,7 @@ ExternalProject_Add(nanomsg
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/nanomsg
     GIT_REPOSITORY https://github.com/nanomsg/nanomsg.git
     #GIT_TAG "096998834451219ee7813d8977f6a4027b0ccb43"
-    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DBUILD_TESTING=OFF
 )
 add_library(libnanomsg STATIC SHARED IMPORTED)
 add_dependencies(libnanomsg nanomsg)
@@ -80,7 +80,7 @@ ExternalProject_Add(cJSON
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/cJSON
     GIT_REPOSITORY https://github.com/DaveGamble/cJSON.git
     GIT_TAG "aafb64a1c549b7b927e339df6d35b1d5059dc235"
-    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DBUILD_TESTING=OFF
 )
 add_library(libcJSON STATIC SHARED IMPORTED)
 add_dependencies(libcJSON cJSON)
@@ -95,6 +95,7 @@ ExternalProject_Add(msgpack
     CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
                   -DMSGPACK_ENABLE_CXX=OFF
                   -DMSGPACK_BUILD_EXAMPLES=OFF
+                  -DBUILD_TESTING=OFF
 )
 add_library(libmsgpack STATIC SHARED IMPORTED)
 add_dependencies(libmsgpack msgpack)
@@ -106,7 +107,7 @@ ExternalProject_Add(cimplog
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/cimplog
     GIT_REPOSITORY https://github.com/Comcast/cimplog.git
     GIT_TAG "master"
-    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DBUILD_TESTING=OFF
 )
 add_library(libcimplog STATIC SHARED IMPORTED)
 add_dependencies(libcimplog cimplog)
