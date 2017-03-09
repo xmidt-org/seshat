@@ -26,7 +26,7 @@ extern "C" {
 /*----------------------------------------------------------------------------*/
 typedef enum __json_interface_return_type {
     JIRT__SUCCESS,
-    JIRT__FILE_BUFFER_NULL,
+    JIRT__FILE_HANDLE_NULL,
     JIRT__ROOT_NULL,
     JIRT__ENTRY_ALREADY_PRESENT,
     JIRT__ENTRY_NOT_FOUND

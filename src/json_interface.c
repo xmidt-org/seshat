@@ -93,8 +93,6 @@ jir_t ji_add_entry( const char *entry, const char *value )
     if( NULL == head ) {
         head = current;
     }
-    printf("head = %p\n", head);
-    printf("head entry = %s, head value = %s\n", head->entry, head->value);
 
     return __ji_persist();
 }
@@ -150,6 +148,9 @@ static jir_t __ji_persist()
     buf = cJSON_Print(root);
     cJSON_Delete(root);
 
+    if( NULL == g_file_handle ) {
+        return JIRT__FILE_HANDLE_NULL;
+    }
     fwrite(buf, sizeof(char), strlen(buf), g_file_handle);
 
     return JIRT__SUCCESS;
