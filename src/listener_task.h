@@ -29,7 +29,4 @@ int listener_thread_start(listener_data_t *data);
 }
 #endif
 
-#define FAKE_SERVER_CODE
-
-
 #endif

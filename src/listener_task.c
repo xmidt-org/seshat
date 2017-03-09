@@ -25,15 +25,13 @@ void *listener(void *data)
         int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
         if (bytes > 0) {
             wrp_msg_t response;
-#ifndef FAKE_SERVER_CODE
+
             response.msg_type = WRP_MSG_TYPE__AUTH;
-#else
-            response.msg_type = 911;            
-#endif
-             printf("listener got %d bytes\n", bytes);
-             response.u.auth.status = create_response_to_message(buf, bytes);
-             nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
-             nn_freemsg(buf);
+
+            printf("listener got %d bytes\n", bytes);
+            response.u.auth.status = create_response_to_message(buf, bytes);
+            nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
+            nn_freemsg(buf);
         } else {
             // do we need to check for socket error other than timed out ?
             printf("listener timed out or socket error?\n");
