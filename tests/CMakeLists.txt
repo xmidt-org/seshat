@@ -27,7 +27,41 @@ target_link_libraries (test_json_interface -lpthread -lmsgpackc -ltrower-base64 
 target_link_libraries (test_json_interface gcov)
 target_link_libraries (test_json_interface cunit)
 
+#-------------------------------------------------------------------------------
+#   test_wrp_interface_CRM_reg
+#-------------------------------------------------------------------------------
+add_test(NAME test_wrp_interface_CRM_reg COMMAND test_wrp_interface_CRM_reg)
+add_executable(test_wrp_interface_CRM_reg test_wrp_interface_CRM_reg.c ../src/wrp_interface.c)
+set_property(TARGET test_wrp_interface_CRM_reg PROPERTY C_STANDARD 99)
+
+target_link_libraries (test_wrp_interface_CRM_reg -lpthread -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lwrp-c -lnanomsg)
+target_link_libraries (test_wrp_interface_CRM_reg gcov)
+target_link_libraries (test_wrp_interface_CRM_reg cunit)
+
+#-------------------------------------------------------------------------------
+#   test_wrp_interface_CRM_ret
+#-------------------------------------------------------------------------------
+add_test(NAME test_wrp_interface_CRM_ret COMMAND test_wrp_interface_CRM_ret)
+add_executable(test_wrp_interface_CRM_ret test_wrp_interface_CRM_ret.c ../src/wrp_interface.c)
+set_property(TARGET test_wrp_interface_CRM_ret PROPERTY C_STANDARD 99)
+
+target_link_libraries (test_wrp_interface_CRM_ret -lpthread -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lwrp-c -lnanomsg)
+target_link_libraries (test_wrp_interface_CRM_ret gcov)
+target_link_libraries (test_wrp_interface_CRM_ret cunit)
+
+#-------------------------------------------------------------------------------
+#   test_wrp_interface_free
+#-------------------------------------------------------------------------------
+add_test(NAME test_wrp_interface_free COMMAND test_wrp_interface_free)
+add_executable(test_wrp_interface_free test_wrp_interface_free.c ../src/wrp_interface.c)
+set_property(TARGET test_wrp_interface_free PROPERTY C_STANDARD 99)
+
+target_link_libraries (test_wrp_interface_free -lpthread -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lwrp-c -lnanomsg)
+target_link_libraries (test_wrp_interface_free gcov)
+target_link_libraries (test_wrp_interface_free cunit)
+
 add_custom_target(coverage
                   COMMAND lcov -q --capture --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_json_interface.dir/__/src --output-file coverage.info
                   COMMAND genhtml coverage.info
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+

@@ -18,56 +18,94 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <cJSON.h>
+#include <wrp-c.h>
 
 #include <CUnit/Basic.h>
 
 #include "../src/json_interface.h"
+#include "../src/wrp_interface.h"
 
 /*----------------------------------------------------------------------------*/
-/*                                  Macros                                    */
+/*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define TEST_FILE_NAME  "test.json"
+#define TEST1_TRAN      "tran1"
+#define TEST1_SOURCE    "source1"
+#define TEST1_DEST      "dest1"
+#define TEST1_INC_SP    false
+#define TEST1_STATUS    200
+#define TEST1_RDR       0
+#define TEST1_PATH      "path1"
+#define TEST1_PAYLOAD   "payload1"
 
-#define TEST1_ENTRY     "service1"
-#define TEST1_VALUE     "url1"
+/*----------------------------------------------------------------------------*/
+/*                            File Scoped Variables                           */
+/*----------------------------------------------------------------------------*/
+static wrp_msg_t m;
 
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-FILE *g_file_handle;
+ssize_t wrp_to_struct( const void *bytes, const size_t length,
+                       const enum wrp_format fmt,
+                       wrp_msg_t **msg )
+{
+    *msg = &m;
+
+    m.msg_type = WRP_MSG_TYPE__RETREIVE;
+    m.u.crud.transaction_uuid = TEST1_TRAN;
+    m.u.crud.source = TEST1_SOURCE;
+    m.u.crud.dest = TEST1_DEST;
+    m.u.crud.path = TEST1_PATH;
+
+    (void) bytes; (void) length; (void) fmt;
+
+    return 1;
+}
+
+jir_t ji_add_entry( const char *entry, const char *value )
+{
+    (void) entry; (void) value;
+    return JIRT__SUCCESS;
+}
+
+jir_t ji_retrieve_entry( const char *entry, char **object )
+{
+    (void) entry; 
+    *object = TEST1_PAYLOAD;
+    return JIRT__SUCCESS;
+}
+
+void wrp_free_struct( wrp_msg_t *msg )
+{
+    (void) msg;
+}
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
 /*----------------------------------------------------------------------------*/
-void test_ji_add_and_retrieve_entry()
+void test_wi_create_response_to_message_ret()
 {
-    char *buf; char *ver_buf;
-    cJSON *ver_buf_JSON = cJSON_CreateObject();
-    cJSON *service = cJSON_CreateObject();
+    wrp_msg_t msg;
 
-    cJSON_AddItemToObject(ver_buf_JSON, TEST1_ENTRY, service);
-    cJSON_AddStringToObject(service, "url", TEST1_VALUE);
-
-    ver_buf = cJSON_Print(ver_buf_JSON);
-    cJSON_Delete(ver_buf_JSON);
- 
-    g_file_handle = fopen(TEST_FILE_NAME, "w");
-    ji_add_entry(TEST1_ENTRY, TEST1_VALUE);
- 
-    ji_retrieve_entry(TEST1_ENTRY, &buf);
-    printf("buf = %s\n", buf);
-    CU_ASSERT(0 == strcmp(ver_buf, buf));
-
-    free(buf); free(ver_buf);
-    fclose(g_file_handle);
+    wi_create_response_to_message(NULL, 0, &msg);
+    CU_ASSERT(WRP_MSG_TYPE__RETREIVE == msg.msg_type);
+    CU_ASSERT(0 == strcmp(msg.u.crud.transaction_uuid, TEST1_TRAN));
+    CU_ASSERT(0 == strcmp(msg.u.crud.source, TEST1_DEST));
+    CU_ASSERT(0 == strcmp(msg.u.crud.dest, TEST1_SOURCE));
+    CU_ASSERT(NULL == msg.u.crud.headers);
+    CU_ASSERT(NULL == msg.u.crud.metadata);
+    CU_ASSERT(TEST1_INC_SP == msg.u.crud.include_spans);
+    CU_ASSERT(TEST1_STATUS == msg.u.crud.status);
+    CU_ASSERT(TEST1_RDR == msg.u.crud.rdr);
+    CU_ASSERT(0 == strcmp(msg.u.crud.path, TEST1_PATH));
+    CU_ASSERT(0 == strcmp(msg.u.crud.payload, TEST1_PAYLOAD));
 }
 
 void add_suites( CU_pSuite *suite )
 {
     printf("--------Start of Test Cases Execution ---------\n");
     *suite = CU_add_suite( "tests", NULL, NULL );
-    CU_add_test( *suite, "Test 1", test_ji_add_and_retrieve_entry );
+    CU_add_test( *suite, "Test 1", test_wi_create_response_to_message_ret );
 }
 
 /*----------------------------------------------------------------------------*/

@@ -18,56 +18,78 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <cJSON.h>
+#include <wrp-c.h>
 
 #include <CUnit/Basic.h>
 
 #include "../src/json_interface.h"
+#include "../src/wrp_interface.h"
 
 /*----------------------------------------------------------------------------*/
-/*                                  Macros                                    */
+/*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define TEST_FILE_NAME  "test.json"
-
-#define TEST1_ENTRY     "service1"
-#define TEST1_VALUE     "url1"
+#define TEST1_TRAN      "tran1"
+#define TEST1_SOURCE    "source1"
+#define TEST1_DEST      "dest1"
+#define TEST1_PATH      "path1"
+#define TEST1_PAYLOAD   "payload1"
 
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-FILE *g_file_handle;
+jir_t ji_add_entry( const char *entry, const char *value )
+{
+    (void) entry; (void) value;
+    return JIRT__SUCCESS;
+}
+
+jir_t ji_retrieve_entry( const char *entry, char **object )
+{
+    (void) entry; (void) object;
+    return JIRT__SUCCESS;
+}
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
 /*----------------------------------------------------------------------------*/
-void test_ji_add_and_retrieve_entry()
+void test_wi_free()
 {
-    char *buf; char *ver_buf;
-    cJSON *ver_buf_JSON = cJSON_CreateObject();
-    cJSON *service = cJSON_CreateObject();
+    wrp_msg_t msg;
 
-    cJSON_AddItemToObject(ver_buf_JSON, TEST1_ENTRY, service);
-    cJSON_AddStringToObject(service, "url", TEST1_VALUE);
+    memset(&msg, 0, sizeof(wrp_msg_t));
+    msg.msg_type = WRP_MSG_TYPE__RETREIVE;
+    msg.u.crud.transaction_uuid = (char *) malloc(1);
+    msg.u.crud.source = (char *) malloc(1);
+    msg.u.crud.dest = (char *) malloc(1);
+    msg.u.crud.path = (char *) malloc(1);
+    msg.u.crud.payload = (char *) malloc(1);
+    wi_free(&msg);
+    CU_ASSERT(NULL == msg.u.crud.transaction_uuid);
+    CU_ASSERT(NULL == msg.u.crud.source);
+    CU_ASSERT(NULL == msg.u.crud.dest);
+    CU_ASSERT(NULL == msg.u.crud.path);
+    CU_ASSERT(NULL == msg.u.crud.payload);
 
-    ver_buf = cJSON_Print(ver_buf_JSON);
-    cJSON_Delete(ver_buf_JSON);
- 
-    g_file_handle = fopen(TEST_FILE_NAME, "w");
-    ji_add_entry(TEST1_ENTRY, TEST1_VALUE);
- 
-    ji_retrieve_entry(TEST1_ENTRY, &buf);
-    printf("buf = %s\n", buf);
-    CU_ASSERT(0 == strcmp(ver_buf, buf));
-
-    free(buf); free(ver_buf);
-    fclose(g_file_handle);
+    memset(&msg, 0, sizeof(wrp_msg_t));
+    msg.msg_type = WRP_MSG_TYPE__CREATE;
+    msg.u.crud.transaction_uuid = TEST1_TRAN;
+    msg.u.crud.source = TEST1_SOURCE;
+    msg.u.crud.dest = TEST1_DEST;
+    msg.u.crud.path = TEST1_PATH;
+    msg.u.crud.payload = TEST1_PAYLOAD;
+    wi_free(&msg);
+    CU_ASSERT(0 == strcmp(msg.u.crud.transaction_uuid, TEST1_TRAN));
+    CU_ASSERT(0 == strcmp(msg.u.crud.source, TEST1_SOURCE));
+    CU_ASSERT(0 == strcmp(msg.u.crud.dest, TEST1_DEST));
+    CU_ASSERT(0 == strcmp(msg.u.crud.path, TEST1_PATH));
+    CU_ASSERT(0 == strcmp(msg.u.crud.payload, TEST1_PAYLOAD));
 }
 
 void add_suites( CU_pSuite *suite )
 {
     printf("--------Start of Test Cases Execution ---------\n");
     *suite = CU_add_suite( "tests", NULL, NULL );
-    CU_add_test( *suite, "Test 1", test_ji_add_and_retrieve_entry );
+    CU_add_test( *suite, "Test 1", test_wi_free );
 }
 
 /*----------------------------------------------------------------------------*/

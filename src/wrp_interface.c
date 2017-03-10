@@ -83,11 +83,11 @@ void wi_free(wrp_msg_t *msg)
 
     if( WRP_MSG_TYPE__RETREIVE == msg->msg_type ) {
         ret_msg_t *ret = &(msg->u.crud);
-        free(ret->transaction_uuid);
-        free(ret->source);
-        free(ret->dest);
-        free(ret->path);
-        free(ret->payload);
+        free(ret->transaction_uuid); ret->transaction_uuid = NULL;
+        free(ret->source);           ret->source = NULL;
+        free(ret->dest);             ret->dest = NULL;
+        free(ret->path);             ret->path = NULL;
+        free(ret->payload);          ret->payload = NULL;
     }
 }
 
