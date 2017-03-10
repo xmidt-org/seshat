@@ -49,6 +49,17 @@ target_link_libraries (test_wrp_interface_CRM_ret -lpthread -lmsgpackc -ltrower-
 target_link_libraries (test_wrp_interface_CRM_ret gcov)
 target_link_libraries (test_wrp_interface_CRM_ret cunit)
 
+#-------------------------------------------------------------------------------
+#   test_wrp_interface_free
+#-------------------------------------------------------------------------------
+add_test(NAME test_wrp_interface_free COMMAND test_wrp_interface_free)
+add_executable(test_wrp_interface_free test_wrp_interface_free.c ../src/wrp_interface.c)
+set_property(TARGET test_wrp_interface_free PROPERTY C_STANDARD 99)
+
+target_link_libraries (test_wrp_interface_free -lpthread -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lwrp-c -lnanomsg)
+target_link_libraries (test_wrp_interface_free gcov)
+target_link_libraries (test_wrp_interface_free cunit)
+
 add_custom_target(coverage
                   COMMAND lcov -q --capture --directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_json_interface.dir/__/src --output-file coverage.info
                   COMMAND genhtml coverage.info
