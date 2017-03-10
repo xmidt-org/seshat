@@ -57,14 +57,12 @@ static void  __ji_cjson_init(void);
 jir_t ji_add_entry( const char *entry, const char *value )
 {
     ji_ll_t *current = head;
-    size_t entry_len = strlen(entry);
-    size_t value_len = strlen(value);
 
     while( NULL != current )
     {
-        if( 0 == strncmp( entry, current->entry, entry_len ) )
+        if( 0 == strcmp( entry, current->entry ) )
         {
-            if( 0 == strncmp( value, current->value, value_len ) )
+            if( 0 == strcmp( value, current->value ) )
             {
                 return JIRT__ENTRY_ALREADY_PRESENT;
             } 
@@ -97,7 +95,7 @@ jir_t ji_retrieve_entry( const char *entry, char **object )
 
     while( NULL != current )
     {
-        if( 0 == strncmp(entry, current->entry, strlen(entry)) )
+        if( 0 == strcmp(entry, current->entry) )
         {
             *object = __ji_cjson_create(current);
             return JIRT__SUCCESS;
