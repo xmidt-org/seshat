@@ -87,24 +87,25 @@ jir_t ji_add_entry( const char *entry, const char *value )
         head = current;
     }
 
-    return __ji_persist();
+    __ji_persist();
+    return JIRT__SUCCESS;
 }
 
-jir_t ji_retrieve_entry( const char *entry_name, char **entry )
+jir_t ji_retrieve_entry( const char *entry, char **object )
 {
     ji_ll_t *current = head;
 
     while( NULL != current )
     {
-        if( 0 == strncmp(entry_name, current->entry, strlen(entry_name)) )
+        if( 0 == strncmp(entry, current->entry, strlen(entry)) )
         {
-            *entry = __ji_cjson_create(current);
+            *object = __ji_cjson_create(current);
             return JIRT__SUCCESS;
         }
         current = current->next;
     }
 
-    *entry = NULL;
+    *object = NULL;
     return JIRT__ENTRY_NOT_FOUND;
 }
 
@@ -178,6 +179,10 @@ static char *__ji_cjson_create(ji_ll_t *node)
     return buf;
 }
 
+/**
+ * @brief Initialization required for cJSON lib.
+ * 
+ */
 static void __ji_cjson_init()
 {
     cJSON_Hooks cjhooks;
@@ -185,4 +190,6 @@ static void __ji_cjson_init()
     cjhooks.malloc_fn = malloc;
     cjhooks.free_fn = free;
     cJSON_InitHooks( &cjhooks );
+
+    cjson_init = true;
 }

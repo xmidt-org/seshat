@@ -36,27 +36,26 @@ typedef enum __json_interface_return_type {
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
 /**
- *  Adds JSON name value entry to the full JSON object passed in through buffer
- *  and returned with the entry added to the buffer.
+ *  Adds item to JSON object.
  *
- *  @param entry      [in] name of the JSON entry.
- *  @param value      [in] value of the JSON entry.
+ *  @param entry     [in]  name of the JSON item.
+ *  @param value     [in]  value of the JSON item.
  *
  *  @return status of add operation
  */
 jir_t ji_add_entry( const char *entry, const char *value );
 
 /**
- *  Retrieves JSON name value entry from the full JSON object passed in through buffer.
+ *  Retrieves JSON object.
  *
- *  @note If entry is not NULL, entry needs to be free()-ed by the caller.
+ *  @note If object is not NULL, it needs to be free()-ed by the caller.
  *
- *  @param entry  [in]  name of the JSON entry.
- *  @param entry  [out] retrieved JSON object. 
+ *  @param entry   [in]  name of the JSON item.
+ *  @param object  [out] retrieved JSON object. 
  *
- *  @return status of add operation
+ *  @return status of retrieve operation
  */
-jir_t ji_retrieve_entry( const char *entry_name, char **entry );
+jir_t ji_retrieve_entry( const char *entry, char **object );
 
 #ifdef __cplusplus
 }
