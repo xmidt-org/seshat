@@ -52,10 +52,10 @@ ssize_t wrp_to_struct( const void *bytes, const size_t length,
     *msg = &m;
 
     m.msg_type = WRP_MSG_TYPE__RETREIVE;
-    m.u.crud.transaction_uuid = TEST1_TRAN;
-    m.u.crud.source = TEST1_SOURCE;
-    m.u.crud.dest = TEST1_DEST;
-    m.u.crud.path = TEST1_PATH;
+    m.u.crud.transaction_uuid = strdup(TEST1_TRAN);
+    m.u.crud.source = strdup(TEST1_SOURCE);
+    m.u.crud.dest = strdup(TEST1_DEST);
+    m.u.crud.path = strdup(TEST1_PATH);
 
     (void) bytes; (void) length; (void) fmt;
 
@@ -71,7 +71,7 @@ jir_t ji_add_entry( const char *entry, const char *value )
 jir_t ji_retrieve_entry( const char *entry, char **object )
 {
     (void) entry; 
-    *object = TEST1_PAYLOAD;
+    *object = strdup(TEST1_PAYLOAD);
     return JIRT__SUCCESS;
 }
 
