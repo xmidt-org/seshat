@@ -63,8 +63,7 @@ void wi_create_response_to_message(char *data, size_t cnt, wrp_msg_t *response)
                 out_crud->metadata = NULL;
                 out_crud->include_spans = false;
                 out_crud->status  = 400;
-                //TODO: After being added to wrp-c
-                //out_crud->rdr     = 0;
+                out_crud->rdr     = 0;
                 out_crud->path    = strdup(in_crud->path);
                 out_crud->payload = process_message_ret( in_crud );
                 if( NULL != out_crud->payload ) {
