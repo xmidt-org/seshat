@@ -29,7 +29,7 @@
 /*----------------------------------------------------------------------------*/
 FILE *g_file_handle;
 
-#define TEST_FILE_NAME "test.json"
+#define TEST_FILE_NAME  "test.json"
 
 #define TEST1_ENTRY     "service1"
 #define TEST1_VALUE     "url1"
