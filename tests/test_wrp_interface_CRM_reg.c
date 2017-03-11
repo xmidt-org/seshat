@@ -33,22 +33,20 @@
 #define TEST1_STATUS     200
 
 /*----------------------------------------------------------------------------*/
-/*                            File Scoped Variables                           */
-/*----------------------------------------------------------------------------*/
-static wrp_msg_t m;
-
-/*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
 ssize_t wrp_to_struct( const void *bytes, const size_t length,
                        const enum wrp_format fmt,
                        wrp_msg_t **msg )
 {
-    *msg = &m;
+    wrp_msg_t *m;
 
-    m.msg_type = WRP_MSG_TYPE__SVC_REGISTRATION;
-    m.u.reg.service_name = TEST1_SERVICE;
-    m.u.reg.url = TEST1_URL;
+    *msg = (wrp_msg_t *) malloc(sizeof(wrp_msg_t));
+    m = *msg;
+
+    m->msg_type = WRP_MSG_TYPE__SVC_REGISTRATION;
+    m->u.reg.service_name = TEST1_SERVICE;
+    m->u.reg.url = TEST1_URL;
 
     (void) bytes; (void) length; (void) fmt;
 
@@ -69,7 +67,7 @@ jir_t ji_retrieve_entry( const char *entry, char **object )
 
 void wrp_free_struct( wrp_msg_t *msg )
 {
-    (void) msg;
+    free(msg);
 }
 
 /*----------------------------------------------------------------------------*/
