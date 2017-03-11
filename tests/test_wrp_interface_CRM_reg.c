@@ -18,56 +18,75 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <cJSON.h>
+#include <wrp-c.h>
 
 #include <CUnit/Basic.h>
 
 #include "../src/json_interface.h"
+#include "../src/wrp_interface.h"
 
 /*----------------------------------------------------------------------------*/
-/*                                  Macros                                    */
+/*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define TEST_FILE_NAME  "test.json"
-
-#define TEST1_ENTRY     "service1"
-#define TEST1_VALUE     "url1"
+#define TEST1_SERVICE    "service1"
+#define TEST1_URL        "url1"
+#define TEST1_STATUS     200
 
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-FILE *g_file_handle;
+ssize_t wrp_to_struct( const void *bytes, const size_t length,
+                       const enum wrp_format fmt,
+                       wrp_msg_t **msg )
+{
+    wrp_msg_t *m;
+
+    *msg = (wrp_msg_t *) malloc(sizeof(wrp_msg_t));
+    m = *msg;
+
+    m->msg_type = WRP_MSG_TYPE__SVC_REGISTRATION;
+    m->u.reg.service_name = TEST1_SERVICE;
+    m->u.reg.url = TEST1_URL;
+
+    (void) bytes; (void) length; (void) fmt;
+
+    return 1;
+}
+
+jir_t ji_add_entry( const char *entry, const char *value )
+{
+    (void) entry; (void) value;
+    return JIRT__SUCCESS;
+}
+
+jir_t ji_retrieve_entry( const char *entry, char **object )
+{
+    (void) entry; (void) object;
+    return JIRT__SUCCESS;
+}
+
+void wrp_free_struct( wrp_msg_t *msg )
+{
+    free(msg);
+}
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
 /*----------------------------------------------------------------------------*/
-void test_ji_add_and_retrieve_entry()
+void test_wi_create_response_to_message_reg()
 {
-    char *buf; char *ver_buf;
-    cJSON *ver_buf_JSON = cJSON_CreateObject();
-    cJSON *service = cJSON_CreateObject();
+    wrp_msg_t msg;
 
-    cJSON_AddItemToObject(ver_buf_JSON, TEST1_ENTRY, service);
-    cJSON_AddStringToObject(service, "url", TEST1_VALUE);
-
-    ver_buf = cJSON_Print(ver_buf_JSON);
-    cJSON_Delete(ver_buf_JSON);
- 
-    g_file_handle = fopen(TEST_FILE_NAME, "w");
-    ji_add_entry(TEST1_ENTRY, TEST1_VALUE);
- 
-    ji_retrieve_entry(TEST1_ENTRY, &buf);
-    printf("buf = %s\n", buf);
-    CU_ASSERT(0 == strcmp(ver_buf, buf));
-
-    free(buf); free(ver_buf);
-    fclose(g_file_handle);
+    wi_create_response_to_message(NULL, 0, &msg);
+    CU_ASSERT(WRP_MSG_TYPE__AUTH == msg.msg_type);
+    CU_ASSERT(TEST1_STATUS == msg.u.auth.status);
 }
 
 void add_suites( CU_pSuite *suite )
 {
     printf("--------Start of Test Cases Execution ---------\n");
     *suite = CU_add_suite( "tests", NULL, NULL );
-    CU_add_test( *suite, "Test 1", test_ji_add_and_retrieve_entry );
+    CU_add_test( *suite, "Test 1", test_wi_create_response_to_message_reg );
 }
 
 /*----------------------------------------------------------------------------*/
