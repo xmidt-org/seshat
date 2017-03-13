@@ -29,14 +29,29 @@ typedef enum __json_interface_return_type {
     JIRT__FILE_HANDLE_NULL,
     JIRT__ROOT_NULL,
     JIRT__ENTRY_ALREADY_PRESENT,
-    JIRT__ENTRY_NOT_FOUND
+    JIRT__ENTRY_NOT_FOUND,
+    JIRT__NO_MEMORY,
+    JIRT__FILE_READ_UNSUCCESSFUL,
+    JIRT__FILE_CONTENT_ERROR
 } jir_t;
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
 /**
- *  Adds item to JSON object.
+ * @brief Initialization of JSON handling.
+ *
+ * @param file_name containing persistent JSON.
+ */
+void ji_init( const char *file_name);
+
+/**
+ * @brief JSON handling cleanup.
+ */
+void ji_destroy(void);
+
+/**
+ *  @brief Adds item to JSON object.
  *
  *  @param entry     [in]  name of the JSON item.
  *  @param value     [in]  value of the JSON item.
@@ -46,7 +61,7 @@ typedef enum __json_interface_return_type {
 jir_t ji_add_entry( const char *entry, const char *value );
 
 /**
- *  Retrieves JSON object.
+ *  @brief Retrieves JSON object.
  *
  *  @note If object is not NULL, it needs to be free()-ed by the caller.
  *

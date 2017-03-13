@@ -18,11 +18,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*----------------------------------------------------------------------------*/
+/*                               Data Structures                              */
+/*----------------------------------------------------------------------------*/
 typedef struct _listener_data_t {
     int socket;
     char *url;
-    FILE *file_handle;
 } listener_data_t;    
+
+/*----------------------------------------------------------------------------*/
+/*                             Function Prototypes                            */
+/*----------------------------------------------------------------------------*/
 int listener_thread_start(listener_data_t *data);    
     
 #ifdef __cplusplus
