@@ -18,7 +18,6 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <assert.h>
@@ -28,6 +27,7 @@
 #include "wrp-c.h"
 #include "nmsg.h"
 #include "listener_task.h"
+#include "json_interface.h"
 
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
@@ -57,7 +57,6 @@ static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
 int recv_socket; //, send_socket;
-FILE *g_file_handle = NULL; // ***Temporary***/
 listener_data_t the_data;
 
 int main( int argc, char **argv)
@@ -122,11 +121,10 @@ int main( int argc, char **argv)
         file_name = "/tmp/seshat_services";
     }
     
-    g_file_handle = fopen(file_name, "w");
+    ji_init(file_name);
     
     the_data.socket = recv_socket;
     the_data.url = url;
-    the_data.file_handle = g_file_handle;
 
     listener_thread_start(&the_data);   
         
@@ -137,7 +135,7 @@ int main( int argc, char **argv)
     }
     
     shutdown_receiver(recv_socket);
-    fclose(g_file_handle);
+    ji_destroy();
     free(url);
 
    return 0;

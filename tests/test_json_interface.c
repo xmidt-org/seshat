@@ -35,7 +35,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-FILE *g_file_handle;
+/* none */
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
@@ -52,7 +52,6 @@ void test_ji_add_and_retrieve_entry()
     ver_buf = cJSON_Print(ver_buf_JSON);
     cJSON_Delete(ver_buf_JSON);
  
-    g_file_handle = fopen(TEST_FILE_NAME, "w");
     ji_add_entry(TEST1_ENTRY, TEST1_VALUE);
  
     ji_retrieve_entry(TEST1_ENTRY, &buf);
@@ -60,7 +59,6 @@ void test_ji_add_and_retrieve_entry()
     CU_ASSERT(0 == strcmp(ver_buf, buf));
 
     free(buf); free(ver_buf);
-    fclose(g_file_handle);
 }
 
 void add_suites( CU_pSuite *suite )
