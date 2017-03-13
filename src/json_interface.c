@@ -40,7 +40,7 @@ typedef struct __ll_node {
 /*----------------------------------------------------------------------------*/
 /*                             File Scoped Variables                          */
 /*----------------------------------------------------------------------------*/
-static FILE *file_handle = NULL;
+static char *f_name = NULL;
 static ji_ll_t *head = NULL;
 static size_t ll_size = 0;
 static bool cjson_init = false;
@@ -50,7 +50,7 @@ static bool cjson_init = false;
 /*----------------------------------------------------------------------------*/
 static void  __ji_cjson_init(void);
 static jir_t __ji_add_node(const char *entry, const char *value);
-static jir_t __ji_file_to_ll(void);
+static jir_t __ji_file_to_ll(FILE *file_handle);
 static char *__ji_node_to_cjson(ji_ll_t *node);
 static jir_t __ji_ll_to_file(void);
 
@@ -59,8 +59,12 @@ static jir_t __ji_ll_to_file(void);
 /*----------------------------------------------------------------------------*/
 void ji_init(const char *file_name)
 {
-    file_handle = fopen(file_name, "a+");
-    __ji_file_to_ll();
+    FILE *file_handle = fopen(file_name, "r");
+
+    f_name = strdup(file_name);
+
+    __ji_file_to_ll(file_handle);
+    fclose(file_handle);
 }
 
 void ji_destroy()
@@ -77,8 +81,6 @@ void ji_destroy()
         current = next;
     } 
     ll_size = 0;
-
-    fclose(file_handle);
 } 
 
 jir_t ji_add_entry( const char *entry, const char *value )
@@ -172,7 +174,7 @@ static jir_t __ji_add_node(const char *entry, const char *value)
  *
  * @return status;
  */
-static jir_t __ji_file_to_ll(void)
+static jir_t __ji_file_to_ll(FILE *file_handle)
 {
     size_t length;
     size_t read_size;
@@ -247,6 +249,11 @@ static jir_t __ji_ll_to_file()
     ji_ll_t *current = head;
     char *buf = NULL, *ctr = NULL;
     size_t entry_len = 0, value_len = 0;
+    FILE *file_handle = fopen(f_name, "w");
+
+    if( NULL == file_handle ) {
+        return JIRT__FILE_HANDLE_NULL;
+    }
 
     if( false == cjson_init ) {
         __ji_cjson_init();
@@ -266,9 +273,6 @@ static jir_t __ji_ll_to_file()
         current = current->next;
     }
 
-    if( NULL == file_handle ) {
-        return JIRT__FILE_HANDLE_NULL;
-    }
     fwrite(buf, sizeof(char), strlen(buf), file_handle);
     free(buf);
 
