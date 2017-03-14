@@ -71,7 +71,8 @@ int ji_init(const char *file_name)
         service = strndup(buf, (c - buf));
         url = strndup((c + 1), &buf[length-1] - c);
         __add_node(service, url);
-        free(service); free(url);
+        free(service);
+        free(url);
         read_size = getline(&buf, &length, file_handle);
     }
     free(buf);
