@@ -54,7 +54,8 @@ void ji_destroy(void);
 int ji_add_entry( const char *entry, const char *value );
 
 /**
- *  Retrieves JSON object.
+ *  Returns the JSON object representation of the service name's URL if found.  
+ *  If not found returns NULL. 
  *
  *  @note If object is not NULL, it needs to be free()-ed by the caller.
  *
