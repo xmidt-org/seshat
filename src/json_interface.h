@@ -24,17 +24,25 @@ extern "C" {
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
-typedef enum __json_interface_return_type {
-    JIRT__SUCCESS,
-    JIRT__FILE_HANDLE_NULL,
-    JIRT__ROOT_NULL,
-    JIRT__ENTRY_ALREADY_PRESENT,
-    JIRT__ENTRY_NOT_FOUND
-} jir_t;
+/* none */
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
+/**
+ *  Inits file handling.
+ *
+ *  @param file_name  [in]  name of the file.
+ *
+ *  @return status of add operation
+ */
+int ji_init(const char *file_name);
+
+/**
+ *  Shutdown file handling.
+ */
+void ji_destroy(void);
+
 /**
  *  Adds item to JSON object.
  *
@@ -43,7 +51,7 @@ typedef enum __json_interface_return_type {
  *
  *  @return status of add operation
  */
-jir_t ji_add_entry( const char *entry, const char *value );
+int ji_add_entry( const char *entry, const char *value );
 
 /**
  *  Retrieves JSON object.
@@ -55,11 +63,10 @@ jir_t ji_add_entry( const char *entry, const char *value );
  *
  *  @return status of retrieve operation
  */
-jir_t ji_retrieve_entry( const char *entry, char **object );
+int ji_retrieve_entry( const char *entry, char **object );
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

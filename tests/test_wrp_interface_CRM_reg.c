@@ -53,16 +53,16 @@ ssize_t wrp_to_struct( const void *bytes, const size_t length,
     return 1;
 }
 
-jir_t ji_add_entry( const char *entry, const char *value )
+int ji_add_entry( const char *entry, const char *value )
 {
     (void) entry; (void) value;
-    return JIRT__SUCCESS;
+    return EXIT_SUCCESS;
 }
 
-jir_t ji_retrieve_entry( const char *entry, char **object )
+int ji_retrieve_entry( const char *entry, char **object )
 {
     (void) entry; (void) object;
-    return JIRT__SUCCESS;
+    return EXIT_SUCCESS;
 }
 
 void wrp_free_struct( wrp_msg_t *msg )

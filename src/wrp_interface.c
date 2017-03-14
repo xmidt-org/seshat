@@ -121,7 +121,7 @@ char *process_message_ret( ret_msg_t *msg )
     char *service = msg->payload;
     char *object  = NULL;
 
-    if( JIRT__SUCCESS == ji_retrieve_entry(service, &object) )
+    if( EXIT_SUCCESS == ji_retrieve_entry(service, &object) )
     {
         return object;
     }
