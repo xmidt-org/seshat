@@ -94,7 +94,6 @@ void test_ji_add_and_retrieve_entry()
 
 void test_ji_init()
 {
-/*
     FILE *fp = fopen(TEST2_FILE_NAME, "w");
     ll_t *current; int i;
     char *entry[] = {TEST_ENTRY1, TEST_ENTRY2, TEST_ENTRY3};
@@ -114,7 +113,6 @@ void test_ji_init()
         CU_ASSERT(0 == strncmp(value[i], current->value, strlen(value[i])));
         current = current->next; i++;
     }
- */
 }
 
 void test_ji_destroy()
