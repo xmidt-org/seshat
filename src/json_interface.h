@@ -24,29 +24,38 @@ extern "C" {
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
-typedef enum __json_interface_return_type {
-    JIRT__SUCCESS,
-    JIRT__FILE_HANDLE_NULL,
-    JIRT__ROOT_NULL,
-    JIRT__ENTRY_ALREADY_PRESENT,
-    JIRT__ENTRY_NOT_FOUND
-} jir_t;
+/* none */
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
 /**
- *  Adds item to JSON object.
+ *  Inits file handling.
  *
- *  @param entry     [in]  name of the JSON item.
- *  @param value     [in]  value of the JSON item.
+ *  @param file_name  [in]  name of the file.
  *
  *  @return status of add operation
  */
-jir_t ji_add_entry( const char *entry, const char *value );
+int ji_init(const char *file_name);
 
 /**
- *  Retrieves JSON object.
+ *  Shutdown file handling.
+ */
+void ji_destroy(void);
+
+/**
+ *  Adds JSON object representation of the service name's URL.
+ *
+ *  @param entry     [in]  name of the JSON item passed in from the wrp-c message.
+ *  @param value     [in]  value of the JSON item passed in from the wrp-c message.
+ *
+ *  @return status of add operation
+ */
+int ji_add_entry( const char *entry, const char *value );
+
+/**
+ *  Returns the JSON object representation of the service name's URL if found.  
+ *  If not found returns NULL. 
  *
  *  @note If object is not NULL, it needs to be free()-ed by the caller.
  *
@@ -55,11 +64,10 @@ jir_t ji_add_entry( const char *entry, const char *value );
  *
  *  @return status of retrieve operation
  */
-jir_t ji_retrieve_entry( const char *entry, char **object );
+int ji_retrieve_entry( const char *entry, char **object );
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

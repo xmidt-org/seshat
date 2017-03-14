@@ -27,15 +27,21 @@
 /*----------------------------------------------------------------------------*/
 /*                                  Macros                                    */
 /*----------------------------------------------------------------------------*/
-#define TEST_FILE_NAME  "test.json"
+#define TEST_ENTRY1     "service1"
+#define TEST_VALUE1     "url1"
 
-#define TEST1_ENTRY     "service1"
-#define TEST1_VALUE     "url1"
+#define TEST_ENTRY2     "service2"
+#define TEST_VALUE2     "tcp://127.0.0.2:1234"
+
+#define TEST_ENTRY3     "foobar"
+#define TEST_VALUE3     "tcp://172.10.99.23:1234"
+
+#define TEST2_FILE_NAME "test2.json"
 
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-FILE *g_file_handle;
+/* none */
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
@@ -46,21 +52,27 @@ void test_ji_add_and_retrieve_entry()
     cJSON *ver_buf_JSON = cJSON_CreateObject();
     cJSON *service = cJSON_CreateObject();
 
-    cJSON_AddItemToObject(ver_buf_JSON, TEST1_ENTRY, service);
-    cJSON_AddStringToObject(service, "url", TEST1_VALUE);
+    cJSON_AddItemToObject(ver_buf_JSON, TEST_ENTRY1, service);
+    cJSON_AddStringToObject(service, "url", TEST_VALUE1);
 
     ver_buf = cJSON_Print(ver_buf_JSON);
     cJSON_Delete(ver_buf_JSON);
  
-    g_file_handle = fopen(TEST_FILE_NAME, "w");
-    ji_add_entry(TEST1_ENTRY, TEST1_VALUE);
+    ji_add_entry(TEST_ENTRY1, TEST_VALUE1);
  
-    ji_retrieve_entry(TEST1_ENTRY, &buf);
+    ji_retrieve_entry(TEST_ENTRY1, &buf);
     printf("buf = %s\n", buf);
     CU_ASSERT(0 == strcmp(ver_buf, buf));
 
     free(buf); free(ver_buf);
-    fclose(g_file_handle);
+}
+
+void test_ji_init()
+{
+}
+
+void test_ji_destroy()
+{
 }
 
 void add_suites( CU_pSuite *suite )
@@ -68,6 +80,8 @@ void add_suites( CU_pSuite *suite )
     printf("--------Start of Test Cases Execution ---------\n");
     *suite = CU_add_suite( "tests", NULL, NULL );
     CU_add_test( *suite, "Test 1", test_ji_add_and_retrieve_entry );
+    CU_add_test( *suite, "Test 2", test_ji_init);
+    CU_add_test( *suite, "Test 3", test_ji_destroy);
 }
 
 /*----------------------------------------------------------------------------*/

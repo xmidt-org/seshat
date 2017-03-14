@@ -25,58 +25,165 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define ITEM "url"
+#define COMMA          ','
+#define ITEM           "url"
 
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
-extern FILE *g_file_handle;
-
 typedef struct __ll_node {
     char *entry;
     char *value;
     struct __ll_node *next;
-} ji_ll_t;
+} ll_t;
 
 /*----------------------------------------------------------------------------*/
 /*                             File Scoped Variables                          */
 /*----------------------------------------------------------------------------*/
-static ji_ll_t *head = NULL;
-static bool cjson_init = false;
+static char *f_name = NULL;
+static ll_t *head = NULL;
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
-static jir_t __ji_persist(void);
-static char *__ji_cjson_create(ji_ll_t *node);
-static void  __ji_cjson_init(void);
+static int __add_node(const char *entry, const char *value);
 
 /*----------------------------------------------------------------------------*/
 /*                             External Functions                             */
 /*----------------------------------------------------------------------------*/
-jir_t ji_add_entry( const char *entry, const char *value )
-{
-    ji_ll_t *current = head;
 
-    while( NULL != current )
-    {
-        if( 0 == strcmp( entry, current->entry ) )
-        {
-            if( 0 == strcmp( value, current->value ) )
-            {
-                return JIRT__ENTRY_ALREADY_PRESENT;
-            } 
-            else
-            {
+/* See json_interface.h for details. */
+int ji_init(const char *file_name)
+{
+    size_t length;
+    int read_size;
+    char *buf;
+    char *service, *url;
+    FILE *file_handle = fopen(file_name, "r");
+    cJSON_Hooks cjhooks;
+
+    if( NULL == file_handle ) {
+        return EXIT_FAILURE;
+    }
+
+    f_name = strdup(file_name);
+    read_size = getline(&buf, &length, file_handle);
+    while( -1 != read_size ) {
+        char *c = strchr(buf, COMMA);
+        service = strndup(buf, (c - buf));
+        url = strndup((c + 1), &buf[length-1] - c);
+        __add_node(service, url);
+        free(service);
+        free(url);
+        read_size = getline(&buf, &length, file_handle);
+    }
+    free(buf);
+    fclose(file_handle);
+
+    cjhooks.malloc_fn = malloc;
+    cjhooks.free_fn = free;
+    cJSON_InitHooks( &cjhooks );
+
+    return EXIT_SUCCESS;
+}
+
+/* See json_interface.h for details. */
+void ji_destroy()
+{
+    ll_t *current = head;
+    ll_t *next;
+
+    while( NULL != current ) {
+        free(current->entry);
+        free(current->value);
+
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    head = NULL;
+} 
+
+/* See json_interface.h for details. */
+int ji_add_entry( const char *entry, const char *value )
+{
+    int rval = __add_node(entry, value);
+    if( 1 == rval ) {
+        ll_t *current = head;
+        FILE *file_handle = fopen(f_name, "w");
+
+        if( NULL == file_handle ) {
+            return EXIT_FAILURE;
+        }
+
+        while( NULL != current ) {
+            fprintf(file_handle, "%s,%s\n", current->entry, current->value);
+            current = current->next;
+        }
+
+        return EXIT_SUCCESS;
+    }
+    return EXIT_SUCCESS;
+}
+
+/* See json_interface.h for details. */
+int ji_retrieve_entry( const char *entry, char **object )
+{
+    ll_t *current = head;
+
+    while( NULL != current ) {
+        if( 0 == strcmp(entry, current->entry) ) {
+            cJSON *root = NULL;
+            cJSON *service = NULL;
+    
+            root = cJSON_CreateObject();
+            service = cJSON_CreateObject();
+            cJSON_AddItemToObject(root, current->entry, service);
+            cJSON_AddStringToObject(service, ITEM, current->value);
+
+            *object = cJSON_Print(root);
+            cJSON_Delete(root);
+            return EXIT_SUCCESS;
+        }
+        current = current->next;
+    }
+
+    *object = NULL;
+    return EXIT_FAILURE;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                             Internal functions                             */
+/*----------------------------------------------------------------------------*/
+/**
+ * @brief Helper function to add/create linked list node for a given entry, value pair.
+ * 
+ * @note return buffer needs to be free()-ed by caller
+ *
+ * @param[in] name of the entry.
+ * @param[in] value of the entry.
+ *
+ * @return 1 when the linked list has been changed, 0 otherwise.
+ */
+static int __add_node(const char *entry, const char *value)
+{
+    ll_t *current = head;
+
+    while( NULL != current )    {
+        if( 0 == strcmp( entry, current->entry ) ) {
+            if( 0 == strcmp( value, current->value) ) {
+                return 0;
+            }
+            else {
                 free(current->value);
-                current->value = strdup(value); 
-                return __ji_persist();
+                current->value = strdup(value);
+                return 1;
             }
         }
         current = current->next;
     }
 
-    current = (ji_ll_t *) malloc( sizeof(ji_ll_t) );
+    current = (ll_t *) malloc( sizeof(ll_t) );
     current->entry = strdup(entry);
     current->value = strdup(value);
     current->next = NULL;
@@ -85,109 +192,5 @@ jir_t ji_add_entry( const char *entry, const char *value )
         head = current;
     }
 
-    __ji_persist();
-    return JIRT__SUCCESS;
-}
-
-jir_t ji_retrieve_entry( const char *entry, char **object )
-{
-    ji_ll_t *current = head;
-
-    while( NULL != current )
-    {
-        if( 0 == strcmp(entry, current->entry) )
-        {
-            *object = __ji_cjson_create(current);
-            return JIRT__SUCCESS;
-        }
-        current = current->next;
-    }
-
-    *object = NULL;
-    return JIRT__ENTRY_NOT_FOUND;
-}
-
-/*----------------------------------------------------------------------------*/
-/*                             Internal functions                             */
-/*----------------------------------------------------------------------------*/
-/**
- * @brief Write out linked list to file.
- * 
- * @return status
- */
-static jir_t __ji_persist()
-{
-    cJSON *root = NULL;
-    ji_ll_t *current = head;
-    char *buf = NULL;
-
-    if( false == cjson_init )
-    {
-        __ji_cjson_init();
-    }
-    root = cJSON_CreateObject();
-
-    while( NULL != current )
-    {
-        cJSON *service = cJSON_CreateObject();
-
-        cJSON_AddItemToObject(root, current->entry, service);
-        cJSON_AddStringToObject(service, ITEM, current->value);
-
-        current = current->next;
-    }
-
-    buf = cJSON_Print(root);
-    cJSON_Delete(root);
-
-    if( NULL == g_file_handle ) {
-        return JIRT__FILE_HANDLE_NULL;
-    }
-    fwrite(buf, sizeof(char), strlen(buf), g_file_handle);
-
-    return JIRT__SUCCESS;
-}
-
-/**
- * @brief Creates a cJSON object from contents of a given linked list node
- * 
- * @note return buffer needs to be free()-ed by caller
- *
- * @param[in] Node of linked list that needs to be cJSON-ised.
- *
- * @return  buffer of the JSON tree
- */
-static char *__ji_cjson_create(ji_ll_t *node)
-{
-    cJSON *root = NULL;
-    cJSON *service = NULL;
-    char *buf = NULL;
-
-    if( false == cjson_init )
-    {
-        __ji_cjson_init();
-    }
-    root = cJSON_CreateObject();
-    service = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, node->entry, service);
-    cJSON_AddStringToObject(service, ITEM, node->value);
-
-    buf = cJSON_Print(root);
-    cJSON_Delete(root);
-    return buf;
-}
-
-/**
- * @brief Initialization required for cJSON lib.
- * 
- */
-static void __ji_cjson_init()
-{
-    cJSON_Hooks cjhooks;
-
-    cjhooks.malloc_fn = malloc;
-    cjhooks.free_fn = free;
-    cJSON_InitHooks( &cjhooks );
-
-    cjson_init = true;
+    return 1;
 }
