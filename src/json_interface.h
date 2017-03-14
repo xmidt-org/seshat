@@ -44,10 +44,10 @@ int ji_init(const char *file_name);
 void ji_destroy(void);
 
 /**
- *  Adds item to JSON object.
+ *  Adds JSON object representation of the service name's URL.
  *
- *  @param entry     [in]  name of the JSON item.
- *  @param value     [in]  value of the JSON item.
+ *  @param entry     [in]  name of the JSON item passed in from the wrp-c message.
+ *  @param value     [in]  value of the JSON item passed in from the wrp-c message.
  *
  *  @return status of add operation
  */

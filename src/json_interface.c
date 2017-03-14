@@ -51,6 +51,8 @@ static int __add_node(const char *entry, const char *value);
 /*----------------------------------------------------------------------------*/
 /*                             External Functions                             */
 /*----------------------------------------------------------------------------*/
+
+/* See json_interface.h for details. */
 int ji_init(const char *file_name)
 {
     size_t length;
@@ -85,6 +87,7 @@ int ji_init(const char *file_name)
     return EXIT_SUCCESS;
 }
 
+/* See json_interface.h for details. */
 void ji_destroy()
 {
     ll_t *current = head;
@@ -101,10 +104,11 @@ void ji_destroy()
     head = NULL;
 } 
 
+/* See json_interface.h for details. */
 int ji_add_entry( const char *entry, const char *value )
 {
     int rval = __add_node(entry, value);
-    if( EXIT_SUCCESS == rval ) {
+    if( 1 == rval ) {
         ll_t *current = head;
         FILE *file_handle = fopen(f_name, "w");
 
@@ -119,9 +123,10 @@ int ji_add_entry( const char *entry, const char *value )
 
         return EXIT_SUCCESS;
     }
-    return rval;
+    return EXIT_SUCCESS;
 }
 
+/* See json_interface.h for details. */
 int ji_retrieve_entry( const char *entry, char **object )
 {
     ll_t *current = head;
@@ -158,7 +163,7 @@ int ji_retrieve_entry( const char *entry, char **object )
  * @param[in] name of the entry.
  * @param[in] value of the entry.
  *
- * @return status
+ * @return 1 when the linked list has been changed, 0 otherwise.
  */
 static int __add_node(const char *entry, const char *value)
 {
@@ -167,12 +172,12 @@ static int __add_node(const char *entry, const char *value)
     while( NULL != current )    {
         if( 0 == strcmp( entry, current->entry ) ) {
             if( 0 == strcmp( value, current->value) ) {
-                return EXIT_FAILURE;
+                return 0;
             }
             else {
                 free(current->value);
                 current->value = strdup(value);
-                return EXIT_SUCCESS;
+                return 1;
             }
         }
         current = current->next;
@@ -187,5 +192,5 @@ static int __add_node(const char *entry, const char *value)
         head = current;
     }
 
-    return EXIT_SUCCESS;
+    return 1;
 }
