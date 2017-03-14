@@ -52,6 +52,8 @@ void test_ji_add_and_retrieve_entry()
     cJSON *ver_buf_JSON;
     cJSON *service;
 
+    printf("test_ji_add_and_retrieve_entry\n");
+
     ji_add_entry(TEST_ENTRY1, TEST_VALUE1);
     ji_add_entry(TEST_ENTRY2, TEST_VALUE2);
     ji_add_entry(TEST_ENTRY3, TEST_VALUE3);
@@ -97,6 +99,8 @@ void test_ji_init()
     char *entry[] = {TEST_ENTRY1, TEST_ENTRY2, TEST_ENTRY3};
     char *value[] = {TEST_VALUE1, TEST_VALUE2, TEST_VALUE3}; 
 
+    printf("test_ji_init\n");
+
     fprintf(fp, "%s,%s\n", TEST_ENTRY1, TEST_VALUE1);
     fprintf(fp, "%s,%s\n", TEST_ENTRY2, TEST_VALUE2);
     fprintf(fp, "%s,%s\n", TEST_ENTRY3, TEST_VALUE3);
@@ -113,6 +117,7 @@ void test_ji_init()
 
 void test_ji_destroy()
 {
+    printf("test_ji_destory\n");
     CU_ASSERT(NULL != head);
     ji_destroy();
     CU_ASSERT(NULL == head);
