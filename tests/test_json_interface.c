@@ -48,7 +48,6 @@ extern ll_t *head;
 /*----------------------------------------------------------------------------*/
 void test_ji_add_and_retrieve_entry()
 {
-/*
     char *buf; char *ver_buf;
     cJSON *ver_buf_JSON;
     cJSON *service;
@@ -91,7 +90,6 @@ void test_ji_add_and_retrieve_entry()
     cJSON_Delete(ver_buf_JSON);
     CU_ASSERT(0 == strcmp(ver_buf, buf));
     free(buf); free(ver_buf);
- */
 }
 
 void test_ji_init()
