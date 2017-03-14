@@ -41,7 +41,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-/* none */
+extern ll_t *head;
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
@@ -49,30 +49,75 @@
 void test_ji_add_and_retrieve_entry()
 {
     char *buf; char *ver_buf;
-    cJSON *ver_buf_JSON = cJSON_CreateObject();
-    cJSON *service = cJSON_CreateObject();
+    cJSON *ver_buf_JSON;
+    cJSON *service;
 
-    cJSON_AddItemToObject(ver_buf_JSON, TEST_ENTRY1, service);
-    cJSON_AddStringToObject(service, "url", TEST_VALUE1);
-
-    ver_buf = cJSON_Print(ver_buf_JSON);
-    cJSON_Delete(ver_buf_JSON);
- 
     ji_add_entry(TEST_ENTRY1, TEST_VALUE1);
+    ji_add_entry(TEST_ENTRY2, TEST_VALUE2);
+    ji_add_entry(TEST_ENTRY3, TEST_VALUE3);
  
     ji_retrieve_entry(TEST_ENTRY1, &buf);
-    printf("buf = %s\n", buf);
+    printf("buf1 = %s\n", buf);
+    ver_buf_JSON = cJSON_CreateObject();
+    service = cJSON_CreateObject();
+    cJSON_AddItemToObject(ver_buf_JSON, TEST_ENTRY1, service);
+    cJSON_AddStringToObject(service, "url", TEST_VALUE1);
+    ver_buf = cJSON_Print(ver_buf_JSON);
+    cJSON_Delete(ver_buf_JSON);
     CU_ASSERT(0 == strcmp(ver_buf, buf));
+    free(buf); free(ver_buf);
 
+    ji_retrieve_entry(TEST_ENTRY2, &buf);
+    printf("buf2 = %s\n", buf);
+    ver_buf_JSON = cJSON_CreateObject();
+    service = cJSON_CreateObject();
+    cJSON_AddItemToObject(ver_buf_JSON, TEST_ENTRY2, service);
+    cJSON_AddStringToObject(service, "url", TEST_VALUE2);
+    ver_buf = cJSON_Print(ver_buf_JSON);
+    cJSON_Delete(ver_buf_JSON);
+    CU_ASSERT(0 == strcmp(ver_buf, buf));
+    free(buf); free(ver_buf);
+
+    ji_retrieve_entry(TEST_ENTRY3, &buf);
+    printf("buf3 = %s\n", buf);
+    ver_buf_JSON = cJSON_CreateObject();
+    service = cJSON_CreateObject();
+    cJSON_AddItemToObject(ver_buf_JSON, TEST_ENTRY3, service);
+    cJSON_AddStringToObject(service, "url", TEST_VALUE3);
+    ver_buf = cJSON_Print(ver_buf_JSON);
+    cJSON_Delete(ver_buf_JSON);
+    CU_ASSERT(0 == strcmp(ver_buf, buf));
     free(buf); free(ver_buf);
 }
 
 void test_ji_init()
 {
+    FILE *fp = fopen(TEST2_FILE_NAME, "w");
+    ll_t *current; int i = 0;
+    char *entry[] = {TEST_ENTRY1, TEST_ENTRY2, TEST_ENTRY3};
+    char *value[] = {TEST_VALUE1, TEST_VALUE2, TEST_VALUE3}; 
+
+    printf("test_ji_init\n");
+
+    fprintf(fp, "%s,%s\n", TEST_ENTRY1, TEST_VALUE1);
+    fprintf(fp, "%s,%s\n", TEST_ENTRY2, TEST_VALUE2);
+    fprintf(fp, "%s,%s\n", TEST_ENTRY3, TEST_VALUE3);
+    fclose(fp);
+
+    ji_init(TEST2_FILE_NAME);
+    current = head;
+    while( NULL != current ) {
+        CU_ASSERT(0 == strncmp(entry[i], current->entry, strlen(entry[i])));
+        CU_ASSERT(0 == strncmp(value[i], current->value, strlen(value[i])));
+        current = current->next; i++;
+    }
 }
 
 void test_ji_destroy()
 {
+    CU_ASSERT(NULL != head);
+    ji_destroy();
+    CU_ASSERT(NULL == head);
 }
 
 void add_suites( CU_pSuite *suite )
