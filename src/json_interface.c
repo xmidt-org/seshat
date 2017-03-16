@@ -63,7 +63,7 @@ int ji_init(const char *file_name)
 
     f_name = strdup(file_name);
     read_size = getline(&buf, &length, file_handle);
-    while( -1 != read_size ) {
+    while( -1 != read_size && NULL != buf ) {
         char *c = strchr(buf, COMMA);
         char *n = strchr(buf, '\n');
         *c = '\0';
