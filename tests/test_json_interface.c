@@ -27,52 +27,73 @@
 /*----------------------------------------------------------------------------*/
 /*                                  Macros                                    */
 /*----------------------------------------------------------------------------*/
-#define TEST_ENTRY1     "service1"
-#define TEST_VALUE1     "url1"
-
-#define TEST_ENTRY2     "service2"
-#define TEST_VALUE2     "tcp://127.0.0.2:1234"
-
-#define TEST_ENTRY3     "foobar"
-#define TEST_VALUE3     "tcp://172.10.99.23:1234"
-
 #define TEST2_FILE_NAME "test2.json"
 
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-/* none */
+extern ll_t *head;
 
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
 /*----------------------------------------------------------------------------*/
 void test_ji_add_and_retrieve_entry()
 {
-    char *buf; char *ver_buf;
-    cJSON *ver_buf_JSON = cJSON_CreateObject();
-    cJSON *service = cJSON_CreateObject();
+    typedef struct {
+        char *e;
+        char *v;
+        char *expected;
+    } test_t;
 
-    cJSON_AddItemToObject(ver_buf_JSON, TEST_ENTRY1, service);
-    cJSON_AddStringToObject(service, "url", TEST_VALUE1);
+    test_t tests[] = {
+        { .e = "service1", .v = "url1",                    .expected = "{\"service1\":{\"url\":\"url1\"}}", },
+        { .e = "service2", .v = "tcp://127.0.0.2:1234",    .expected = "{\"service2\":{\"url\":\"tcp://127.0.0.2:1234\"}}", },
+        { .e = "foobar",   .v = "tcp://172.10.99.23:1234", .expected = "{\"foobar\":{\"url\":\"tcp://172.10.99.23:1234\"}}" },
+    };
+    char *buf;
+    size_t i = 0;
 
-    ver_buf = cJSON_Print(ver_buf_JSON);
-    cJSON_Delete(ver_buf_JSON);
- 
-    ji_add_entry(TEST_ENTRY1, TEST_VALUE1);
- 
-    ji_retrieve_entry(TEST_ENTRY1, &buf);
-    printf("buf = %s\n", buf);
-    CU_ASSERT(0 == strcmp(ver_buf, buf));
+    for( i = 0; i < sizeof(tests)/sizeof(test_t); i++ ) {
+        ji_add_entry( tests[i].e, tests[i].v );
+    }
 
-    free(buf); free(ver_buf);
+    for( i = 0; i < sizeof(tests)/sizeof(test_t); i++ ) {
+        ji_retrieve_entry( tests[i].e, &buf );
+        printf("buf = %s\n", buf);
+        CU_ASSERT(0 == strcmp( tests[i].expected, buf) );
+        free(buf);
+    }  
 }
 
 void test_ji_init()
 {
+    FILE *fp = fopen(TEST2_FILE_NAME, "w");
+    char *entry[] = { "service1", "service2",             "foobar" };
+    char *value[] = { "url1",     "tcp://127.0.0.2:1234", "tcp://172.10.99.23:1234" }; 
+    ll_t *current;
+    int i;
+
+    for(i = 0;i < 3; i++) {
+        fprintf(fp, "%s,%s\n", entry[i], value[i]);
+    }
+    fclose(fp);
+
+    ji_init(TEST2_FILE_NAME);
+    current = head;
+    i = 0;
+    while( NULL != current ) {
+        CU_ASSERT(0 == strcmp(entry[i], current->entry));
+        CU_ASSERT(0 == strcmp(value[i], current->value));
+        current = current->next;
+        i++;
+    }
 }
 
 void test_ji_destroy()
 {
+    CU_ASSERT(NULL != head);
+    ji_destroy();
+    CU_ASSERT(NULL == head);
 }
 
 void add_suites( CU_pSuite *suite )

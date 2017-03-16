@@ -31,17 +31,12 @@
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
-typedef struct __ll_node {
-    char *entry;
-    char *value;
-    struct __ll_node *next;
-} ll_t;
+ll_t *head = NULL;
 
 /*----------------------------------------------------------------------------*/
 /*                             File Scoped Variables                          */
 /*----------------------------------------------------------------------------*/
 static char *f_name = NULL;
-static ll_t *head = NULL;
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
@@ -70,11 +65,15 @@ int ji_init(const char *file_name)
     read_size = getline(&buf, &length, file_handle);
     while( -1 != read_size ) {
         char *c = strchr(buf, COMMA);
-        service = strndup(buf, (c - buf));
-        url = strndup((c + 1), &buf[length-1] - c);
+        char *n = strchr(buf, '\n');
+        if( NULL == c || NULL == n ) {
+            break;
+        }
+        *c = '\0';
+        service = buf;
+        *n = '\0';
+        url = c + 1;
         __add_node(service, url);
-        free(service);
-        free(url);
         read_size = getline(&buf, &length, file_handle);
     }
     free(buf);
@@ -109,8 +108,8 @@ int ji_add_entry( const char *entry, const char *value )
 {
     int rval = __add_node(entry, value);
     if( 1 == rval ) {
-        ll_t *current = head;
         FILE *file_handle = fopen(f_name, "w");
+        ll_t *current = head;
 
         if( NULL == file_handle ) {
             return EXIT_FAILURE;
@@ -121,6 +120,7 @@ int ji_add_entry( const char *entry, const char *value )
             current = current->next;
         }
 
+        fclose(file_handle);
         return EXIT_SUCCESS;
     }
     return EXIT_SUCCESS;
@@ -141,7 +141,7 @@ int ji_retrieve_entry( const char *entry, char **object )
             cJSON_AddItemToObject(root, current->entry, service);
             cJSON_AddStringToObject(service, ITEM, current->value);
 
-            *object = cJSON_Print(root);
+            *object = cJSON_PrintUnformatted(root);
             cJSON_Delete(root);
             return EXIT_SUCCESS;
         }
@@ -168,8 +168,9 @@ int ji_retrieve_entry( const char *entry, char **object )
 static int __add_node(const char *entry, const char *value)
 {
     ll_t *current = head;
+    ll_t *prev;
 
-    while( NULL != current )    {
+    while( NULL != current ) {
         if( 0 == strcmp( entry, current->entry ) ) {
             if( 0 == strcmp( value, current->value) ) {
                 return 0;
@@ -180,6 +181,7 @@ static int __add_node(const char *entry, const char *value)
                 return 1;
             }
         }
+        prev = current;
         current = current->next;
     }
 
@@ -190,6 +192,8 @@ static int __add_node(const char *entry, const char *value)
 
     if( NULL == head ) {
         head = current;
+    } else {
+        prev->next = current;
     }
 
     return 1;
