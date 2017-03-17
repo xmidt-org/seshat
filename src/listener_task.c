@@ -50,25 +50,23 @@ int listener_thread_start(listener_data_t *data)
 static void *listener(void *data)
 {
     listener_data_t in_data = * (listener_data_t *) data;
-    char *buf = NULL; 
+    char *in_buf = NULL; 
+    void *out_buf = NULL;
     
     sleep(10);
     
     while( 1 ) {
-        int bytes = nn_recv (in_data.socket, &buf, NN_MSG, 0);
-        if( bytes > 0 )
-        {
-            wrp_msg_t response;
-
-            printf("listener got %d bytes\n", bytes);
-            memset(&response, 0, sizeof(wrp_msg_t));
-            wi_create_response_to_message(buf, bytes, &response);
-            nn_send(in_data.socket, &response, sizeof(wrp_msg_t), 0);
-            wi_free(&response);
-            nn_freemsg(buf);
+        int in_size = nn_recv (in_data.socket, &in_buf, NN_MSG, 0);
+        printf("listener got %d bytes\n", in_size);
+        if( 0 < in_size ) {
+            ssize_t out_size = wi_create_response_to_message(in_buf, in_size, &out_buf);
+            if( 0 < out_size ) {
+                nn_send(in_data.socket, out_buf, out_size, 0);
+                free(out_buf);
+            }
+            nn_freemsg(in_buf);
         } 
-        else 
-        {
+        else {
             // do we need to check for socket error other than timed out ?
             printf("listener timed out or socket error?\n");
             continue;

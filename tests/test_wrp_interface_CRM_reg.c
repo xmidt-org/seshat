@@ -28,31 +28,11 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define TEST1_SERVICE    "service1"
-#define TEST1_URL        "url1"
-#define TEST1_STATUS     200
+/* none */
 
 /*----------------------------------------------------------------------------*/
 /*                                   Mocks                                    */
 /*----------------------------------------------------------------------------*/
-ssize_t wrp_to_struct( const void *bytes, const size_t length,
-                       const enum wrp_format fmt,
-                       wrp_msg_t **msg )
-{
-    wrp_msg_t *m;
-
-    *msg = (wrp_msg_t *) malloc(sizeof(wrp_msg_t));
-    m = *msg;
-
-    m->msg_type = WRP_MSG_TYPE__SVC_REGISTRATION;
-    m->u.reg.service_name = TEST1_SERVICE;
-    m->u.reg.url = TEST1_URL;
-
-    (void) bytes; (void) length; (void) fmt;
-
-    return 1;
-}
-
 int ji_add_entry( const char *entry, const char *value )
 {
     (void) entry; (void) value;
@@ -65,21 +45,50 @@ int ji_retrieve_entry( const char *entry, char **object )
     return EXIT_SUCCESS;
 }
 
-void wrp_free_struct( wrp_msg_t *msg )
-{
-    free(msg);
-}
-
 /*----------------------------------------------------------------------------*/
 /*                                   Tests                                    */
 /*----------------------------------------------------------------------------*/
 void test_wi_create_response_to_message_reg()
 {
-    wrp_msg_t msg;
+    typedef struct {
+        wrp_msg_t s;
+        wrp_msg_t r;
+    } test_t;
 
-    wi_create_response_to_message(NULL, 0, &msg);
-    CU_ASSERT(WRP_MSG_TYPE__AUTH == msg.msg_type);
-    CU_ASSERT(TEST1_STATUS == msg.u.auth.status);
+    test_t tests[] = {
+        {
+            .s.msg_type = WRP_MSG_TYPE__AUTH,
+            .s.u.auth.status = 0,
+
+            .r.msg_type = WRP_MSG_TYPE__AUTH,
+            .r.u.auth.status = 400,
+        },
+        {
+            .s.msg_type = WRP_MSG_TYPE__SVC_REGISTRATION,
+            .s.u.reg.service_name = "service1",
+            .s.u.reg.url = "url1",
+ 
+            .r.msg_type = WRP_MSG_TYPE__AUTH,
+            .r.u.auth.status = 200,
+        },
+    };
+    size_t t_size = sizeof(tests)/sizeof(test_t);
+    size_t i;
+
+    for( i = 0; i < t_size; i++ ) {
+        void *data;
+        void *bytes;
+        wrp_msg_t *msg;
+        ssize_t data_s = wrp_struct_to(&tests[i].s, WRP_BYTES, &data);
+        ssize_t bytes_s = wi_create_response_to_message(data, data_s, &bytes);
+        CU_ASSERT(0 < bytes_s);
+        ssize_t msg_s = wrp_to_struct(bytes, bytes_s, WRP_BYTES, &msg);
+        CU_ASSERT(0 < msg_s);
+        CU_ASSERT(tests[i].r.msg_type == msg->msg_type);
+        CU_ASSERT(tests[i].r.u.auth.status == msg->u.auth.status);
+        wrp_free_struct(msg);
+        free(bytes);
+    }
 }
 
 void add_suites( CU_pSuite *suite )
