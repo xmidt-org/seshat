@@ -45,7 +45,7 @@ add_test(NAME test_wrp_interface_CRM_ret COMMAND test_wrp_interface_CRM_ret)
 add_executable(test_wrp_interface_CRM_ret test_wrp_interface_CRM_ret.c ../src/wrp_interface.c)
 set_property(TARGET test_wrp_interface_CRM_ret PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_wrp_interface_CRM_ret -lpthread -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lwrp-c -lnanomsg)
+target_link_libraries (test_wrp_interface_CRM_ret -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lrt -lnanomsg)
 target_link_libraries (test_wrp_interface_CRM_ret gcov)
 target_link_libraries (test_wrp_interface_CRM_ret cunit)
 
