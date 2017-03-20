@@ -21,24 +21,18 @@ extern "C" {
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
 /**
- *  Process an input wrp message.
+ *  Process an input message.
  *
- *  @note If object is not NULL, object needs to be free()-ed by the caller.
+ *  @note If message is not NULL, it needs to be free()-ed by the caller using 
+ *        wi_free().
  *
- *  @param data      [in]  wrp message.
- *  @param value     [in]  size of the wrp message.
- *  @param response  [out] wrp response.
+ *  @param data      [in]  data received that needs to be parsed.
+ *  @param value     [in]  size of the data.
+ *  @param message   [out] message in response to data received.
  *
+ *  @return size of valid message, < 0 otherwise.
  */
-void wi_create_response_to_message(char *data, size_t cnt, wrp_msg_t *response);
-
-/**
- *  Free heap allocations for wrp message.
- *
- *  @param msg [in]  wrp message.
- *
- */
-void wi_free(wrp_msg_t *msg);
+ssize_t wi_create_response_to_message(void *data, size_t cnt, void **message);
 
 #ifdef __cplusplus
 }

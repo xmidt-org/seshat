@@ -56,7 +56,7 @@ static void __sig_handler(int sig);
 static void init_signal_handler(void);
 static void _exit_process_(int signum);
 
-int recv_socket; //, send_socket;
+int recv_socket; 
 listener_data_t the_data;
 
 int main( int argc, char **argv)
