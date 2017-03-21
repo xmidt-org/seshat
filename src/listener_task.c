@@ -61,8 +61,9 @@ static void *listener(void *data)
         if( 0 < in_size ) {
             ssize_t out_size = wi_create_response_to_message(in_buf, in_size, &out_buf);
             if( 0 < out_size ) {
-                nn_send(in_data.socket, out_buf, out_size, 0);
-                free(out_buf);
+                if ( 0 > nn_send(in_data.socket, out_buf, out_size, 0) ) {
+                    free(out_buf);
+                }
             }
             nn_freemsg(in_buf);
         } 
