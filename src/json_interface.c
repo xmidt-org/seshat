@@ -57,11 +57,12 @@ int ji_init(const char *file_name)
     FILE *file_handle = fopen(file_name, "r");
     cJSON_Hooks cjhooks;
 
+    f_name = strdup(file_name);
+    
     if( NULL == file_handle ) {
         return EXIT_FAILURE;
     }
 
-    f_name = strdup(file_name);
     read_size = getline(&buf, &length, file_handle);
     while( -1 != read_size ) {
         char *c = strchr(buf, COMMA);
