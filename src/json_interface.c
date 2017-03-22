@@ -168,7 +168,7 @@ int ji_retrieve_entry( const char *entry, char **object )
 static int __add_node(const char *entry, const char *value)
 {
     ll_t *current = head;
-    ll_t *prev;
+    ll_t *prev = NULL;
 
     while( NULL != current ) {
         if( 0 == strcmp( entry, current->entry ) ) {

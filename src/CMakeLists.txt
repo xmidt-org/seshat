@@ -31,7 +31,7 @@ target_link_libraries (seshat
     -lpthread
     -lrt
     )
-
+install (TARGETS seshat DESTINATION bin)
 
 target_link_libraries (fake_server
     ${CMAKE_THREAD_LIBS_INIT}
