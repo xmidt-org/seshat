@@ -50,9 +50,8 @@ static int __add_node(const char *entry, const char *value);
 /* See json_interface.h for details. */
 int ji_init(const char *file_name)
 {
-    size_t length;
-    int read_size;
-    char *buf;
+    size_t length = 0;// required
+    char *buf = NULL;// required
     char *service, *url;
     FILE *file_handle = fopen(file_name, "r");
     cJSON_Hooks cjhooks;
@@ -63,8 +62,7 @@ int ji_init(const char *file_name)
         return EXIT_FAILURE;
     }
 
-    read_size = getline(&buf, &length, file_handle);
-    while( -1 != read_size ) {
+    while( -1 != getline(&buf, &length, file_handle)) {
         char *c = strchr(buf, COMMA);
         char *n = strchr(buf, '\n');
         if( NULL == c || NULL == n ) {
@@ -75,8 +73,8 @@ int ji_init(const char *file_name)
         *n = '\0';
         url = c + 1;
         __add_node(service, url);
-        read_size = getline(&buf, &length, file_handle);
     }
+
     free(buf);
     fclose(file_handle);
 
