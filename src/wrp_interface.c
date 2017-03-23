@@ -28,7 +28,7 @@ typedef struct wrp_crud_msg             ret_msg_t;
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
-static void process_message_reg( reg_msg_t *msg );
+static int process_message_reg( reg_msg_t *msg );
 static char *process_message_ret( ret_msg_t *msg );
 
 /*----------------------------------------------------------------------------*/
@@ -40,18 +40,26 @@ ssize_t wi_create_response_to_message(void *data, size_t cnt, void **message)
     wrp_msg_t response;
     ssize_t   message_size;
 
-    response.msg_type = WRP_MSG_TYPE__AUTH;
-    response.u.auth.status = 400;
+    memset(&response, 0, sizeof(wrp_msg_t));
+
     if( 0 < wrp_to_struct(data, cnt, WRP_BYTES, &in_msg) ) {
-        if( in_msg->msg_type == WRP_MSG_TYPE__SVC_REGISTRATION || in_msg->msg_type == WRP_MSG_TYPE__RETREIVE ) {
-            response.u.auth.status = 200;
-            if( WRP_MSG_TYPE__SVC_REGISTRATION == in_msg->msg_type ) {
-                process_message_reg( &(in_msg->u.reg) );
-            }
-            else {
+        switch (in_msg->msg_type) {
+            case (WRP_MSG_TYPE__SVC_REGISTRATION): {
+		response.msg_type = WRP_MSG_TYPE__AUTH;                 
+		if ( 0 == process_message_reg( &(in_msg->u.reg))) {
+                    response.u.auth.status =200;
+                } else {
+			response.u.auth.status = 400;
+			}
+	    }
+            break;
+            
+            case (WRP_MSG_TYPE__RETREIVE):
+            {
                 ret_msg_t *in_crud  = &(in_msg->u.crud);
                 ret_msg_t *out_crud = &(response.u.crud);
 
+    		out_crud->status = 400; // default to failed
                 response.msg_type = WRP_MSG_TYPE__RETREIVE;
                 out_crud->transaction_uuid = strdup(in_crud->transaction_uuid);
                 out_crud->source  = strdup(in_crud->dest);
@@ -67,24 +75,43 @@ ssize_t wi_create_response_to_message(void *data, size_t cnt, void **message)
                 out_crud->payload = process_message_ret( in_crud );
                 if( NULL != out_crud->payload ) {
                     out_crud->status = 200;
-                }
+                }        
             }
+            break;
+            
+	    case (WRP_MSG_TYPE__AUTH): // useles but the tests want it and I am getting tired ;-(
+		response.msg_type = WRP_MSG_TYPE__AUTH;                 
+                response.u.auth.status = 400;
+	    break;		
+    
+            default:
+            	return -1;    
+            break;
         }
-        wrp_free_struct(in_msg);
+    } else {
+	return -1;
     }
 
-    message_size = wrp_struct_to(&response, WRP_BYTES, message);
+
+    message_size = wrp_struct_to(&response, WRP_BYTES, message);    
     if( WRP_MSG_TYPE__RETREIVE == response.msg_type ) {
         ret_msg_t *ret = &(response.u.crud);
-        free(ret->transaction_uuid);
-        free(ret->source);
-        free(ret->dest);
-        free(ret->path);
-        if( NULL != ret->payload ) {
+        if (ret->transaction_uuid)
+            free(ret->transaction_uuid);
+        if (ret->dest)             
+            free(ret->dest);
+        if (ret->path)             
+            free(ret->path);
+        if (ret->payload )         
             free(ret->payload);
-        }
+        if (ret->source)           
+            free(ret->source);
     }
-
+    
+    if (in_msg) {
+        wrp_free_struct(in_msg);
+    }
+       
     return message_size;
 }
 
@@ -96,12 +123,17 @@ ssize_t wi_create_response_to_message(void *data, size_t cnt, void **message)
  *
  * @param[in] wrp registration message.
  */
-void process_message_reg( reg_msg_t *msg )
+int process_message_reg( reg_msg_t *msg )
 {
     char *service = msg->service_name;
     char *url     = msg->url;
-
-    ji_add_entry(service, url); 
+    
+    if (service && url) {
+        ji_add_entry(service, url); 
+        return 0;
+    }
+    
+    return -1;
 }
 
 /**
