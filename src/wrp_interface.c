@@ -85,8 +85,9 @@ ssize_t wi_create_response_to_message(void *data, size_t cnt, void **message)
 	    break;		
     
             default:
-            	return -1;    
-            break;
+            	response.msg_type = WRP_MSG_TYPE__AUTH;                 
+                response.u.auth.status = 501; // Not Implemented
+	   break;
         }
     } else {
 	return -1;
