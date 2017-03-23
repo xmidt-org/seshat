@@ -110,8 +110,7 @@ void test_wi_create_response_to_message_ret()
         CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.transaction_uuid, msg->u.crud.transaction_uuid);
         CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.source, msg->u.crud.source);
         CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.dest, msg->u.crud.dest);
-        // Temporarily commenting out until https://github.com/Comcast/wrp-c/pull/38 is merged.
-        //CU_ASSERT(tests[i].r.u.crud.status == msg->u.crud.status);
+        CU_ASSERT(tests[i].r.u.crud.status == msg->u.crud.status);
         CU_ASSERT(tests[i].r.u.crud.rdr == msg->u.crud.rdr);
         CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.path, msg->u.crud.path);
         CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.payload, msg->u.crud.payload);
