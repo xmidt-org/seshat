@@ -5,7 +5,7 @@
 #include "fake_server.h"
 #include <pthread.h>
 
-
+/*******************************************************************/
 
 static pthread_t fake_thread_id;
 
