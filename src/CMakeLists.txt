@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 set(PROJ_WRPC seshat)
-set(SOURCES main.c nmsg.c listener_task.c wrp_interface.c)
+set(SOURCES main.c nmsg.c listener_task.c wrp_interface.c json_interface.c)
 set(FAKE_SERVER_SOURCES fake_server.c)
 
 add_executable(seshat ${SOURCES})
@@ -31,7 +31,7 @@ target_link_libraries (seshat
     -lpthread
     -lrt
     )
-
+install (TARGETS seshat DESTINATION bin)
 
 target_link_libraries (fake_server
     ${CMAKE_THREAD_LIBS_INIT}

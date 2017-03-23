@@ -93,7 +93,6 @@ int main(int argc, char **argv)
     
     fake_server_data.socket = fake_server_socket;
     fake_server_data.url = url;
-    fake_server_data.file_handle = NULL;   
     
     fake_server_thread_start(&fake_server_data);
     
