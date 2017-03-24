@@ -7,6 +7,7 @@
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
 #include "nmsg.h"
+#include "seshat_log.h"
 
 #define SOCK_SEND_TIMEOUT_MS 2000
 
@@ -26,12 +27,12 @@ int connect_receiver (char *url)
 
         sock = nn_socket (AF_SP, NN_PULL);
 	if (sock < 0) {
-		printf ("Unable to create rcv socket: %s\n",
+		SeshatError("Unable to create rcv socket: %s\n",
 			strerror_r (errno, errbuf, 100));
  		return sock;
 	}
         if (nn_bind (sock, url) < 0) {
-		printf ("Unable to bind to receive socket %s: %s\n",
+		SeshatError("Unable to bind to receive socket %s: %s\n",
 			url, strerror_r (errno, errbuf, 100));
                 nn_close(sock);
                 sock = -1;
@@ -59,14 +60,14 @@ int connect_sender (char *url)
 
         sock = nn_socket (AF_SP, NN_PUSH);
 	if (sock < 0) {
-		printf ("Unable to create send socket: %s\n",
+		SeshatError("Unable to create send socket: %s\n",
 			strerror_r (errno, errbuf, 100));
  		return sock;
 	}
 	if (set_timeout) {
 		if (nn_setsockopt (sock, NN_SOL_SOCKET, NN_SNDTIMEO, 
 					&send_timeout, sizeof (send_timeout)) < 0) {
-			printf ("Unable to set socket timeout: %s: %s\n",
+			SeshatError("Unable to set socket timeout: %s: %s\n",
 				url, strerror_r (errno, errbuf, 100));
                         nn_close(sock);
 	 		return -1;
@@ -74,7 +75,7 @@ int connect_sender (char *url)
         }
         
         if (nn_connect (sock, url) < 0) {
-		printf ("Unable to connect to send socket %s: %s\n",
+		SeshatError("Unable to connect to send socket %s: %s\n",
 			url, strerror_r (errno, errbuf, 100));
 		nn_close(sock);
                 sock = -1;
@@ -98,11 +99,11 @@ char *receive_msg (int sock, int *bytes)
   *bytes = nn_recv (sock, &buf, NN_MSG, 0);
 
   if (*bytes < 0) { 
-		printf ("Error receiving msg: %s\n", strerror_r (errno, errbuf, 100));
+		SeshatError("Error receiving msg: %s\n", strerror_r (errno, errbuf, 100));
 		return NULL;
     }
   
-    printf ("RECEIVED %d bytes: \"%s\"\n", *bytes, buf);
+    SeshatInfo("RECEIVED %d bytes: \"%s\"\n", *bytes, buf);
 
     return buf;
 }
@@ -113,11 +114,11 @@ int send_msg (const char *msg, int sock)
   int bytes;
 	bytes = nn_send (sock, msg, sz_msg, 0);
   if (bytes < 0) { 
-		printf ("Error sending msg: %s\n", strerror_r (errno, errbuf, 100));
+		SeshatError("Error sending msg: %s\n", strerror_r (errno, errbuf, 100));
 		return -1;
 	}
   if (bytes != sz_msg) {
-		printf ("Not all bytes sent, just %d\n", bytes);
+		SeshatError("Not all bytes sent, just %d\n", bytes);
 		return -1;
 	}
 	return 0;
