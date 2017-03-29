@@ -53,11 +53,17 @@ int ji_init(const char *file_name)
     size_t length = 0;// required
     char *buf = NULL;// required
     char *service, *url;
-    FILE *file_handle = fopen(file_name, "r");
+    FILE *file_handle;
     cJSON_Hooks cjhooks;
 
-    f_name = strdup(file_name);
+    if (file_name && file_name[0]) {
+        f_name = strdup(file_name);
+    } else {
+        f_name = NULL;
+        return EXIT_FAILURE;
+    }
     
+    file_handle  = fopen(f_name, "r");
     if( NULL == file_handle ) {
         return EXIT_FAILURE;
     }

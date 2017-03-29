@@ -64,7 +64,6 @@ int main( int argc, char **argv)
 {
     int item;
     int options_index = 0;
-    int str_len = 0;
     int timeout_val;
     int nn_err;
     
@@ -75,16 +74,12 @@ int main( int argc, char **argv)
     {
         switch (item) {
             case 'f':
-                str_len = strlen(optarg);
-                file_name = (char *) malloc(str_len + 1);
-                memset(file_name, 0, str_len);
-                strncpy(file_name, optarg, str_len);
+                // str_len = strlen(optarg);
+                file_name = strdup(optarg);
                 break;
             case 'u':
-                str_len = strlen(optarg);
-                url = (char *) malloc(str_len + 1);
-                memset(url, 0, str_len);
-                strncpy(url, optarg, str_len);
+                // str_len = strlen(optarg);
+                url = strdup(optarg);
                 break;
         }    
     }
@@ -94,7 +89,7 @@ int main( int argc, char **argv)
      if (file_name != NULL) {
          free(file_name);
      }
-     exit(-1);
+     return -1;
     } 
     
 
@@ -102,12 +97,12 @@ int main( int argc, char **argv)
     if ( -1 == recv_socket) {
         SeshatError("Failed to open a listener socket on %s\n", url);
         free(url);
-        exit (-2);
+        return -2;
     } else if (0 > (nn_err = nn_bind(recv_socket, url))) {
         SeshatError("Failed to bind listener socket on %s, %d\n", url, nn_err);
         shutdown_receiver(recv_socket);
         free(url);
-        exit (-3);            
+        return -3;           
     }
 
     timeout_val = 5000; // ms    
@@ -137,6 +132,7 @@ int main( int argc, char **argv)
     
     shutdown_receiver(recv_socket);
     ji_destroy();
+    free(file_name);
     free(url);
 
    return 0;
