@@ -63,7 +63,7 @@ int ji_init(const char *file_name)
         return EXIT_FAILURE;
     }
     
-    file_handle  = fopen(f_name, "r");
+    file_handle  = fopen(f_name, "r\0");
     if( NULL == file_handle ) {
         return EXIT_FAILURE;
     }
