@@ -28,6 +28,7 @@
 #include "nmsg.h"
 #include "listener_task.h"
 #include "json_interface.h"
+#include "seshat_log.h"
 
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
@@ -89,7 +90,7 @@ int main( int argc, char **argv)
     }
     
     if (NULL == url) {
-     printf("%s:url is a required parameter!\n", argv[0]);
+     SeshatError("%s:url is a required parameter!\n", argv[0]);
      if (file_name != NULL) {
          free(file_name);
      }
@@ -99,11 +100,11 @@ int main( int argc, char **argv)
 
     recv_socket = nn_socket (AF_SP, NN_REP);
     if ( -1 == recv_socket) {
-        printf("Failed to open a listener socket on %s\n", url);
+        SeshatError("Failed to open a listener socket on %s\n", url);
         free(url);
         exit (-2);
     } else if (0 > (nn_err = nn_bind(recv_socket, url))) {
-        printf("Failed to bind listener socket on %s, %d\n", url, nn_err);
+        SeshatError("Failed to bind listener socket on %s, %d\n", url, nn_err);
         shutdown_receiver(recv_socket);
         free(url);
         exit (-3);            
@@ -112,10 +113,10 @@ int main( int argc, char **argv)
     timeout_val = 5000; // ms    
     if (0 != nn_setsockopt (recv_socket, NN_SOL_SOCKET, NN_RCVTIMEO,
             &timeout_val, sizeof(timeout_val))) {
-        printf("Failed to set wait time out!\n");
+        SeshatError("Failed to set wait time out!\n");
     }
 
-    printf("Socket %d set to listen to %s\n", recv_socket, url);
+    SeshatInfo("Socket %d set to listen to %s\n", recv_socket, url);
 
     if (NULL == file_name) {
         file_name = "/tmp/seshat_services";
@@ -130,7 +131,7 @@ int main( int argc, char **argv)
         
     while (1) {
         
-        printf("main() waiting ...\n");
+        SeshatPrint("main() waiting ...\n");
         sleep(15);
     }
     
@@ -164,42 +165,47 @@ void __sig_handler(int sig)
 
     if ( sig == SIGINT ) {
         signal(SIGINT, __sig_handler); /* reset it to this function */
-        printf("seshat SIGINT received!\n");
+        SeshatInfo("seshat SIGINT received!\n");
         _exit_process_(sig);
     }
     else if ( sig == SIGUSR1 ) {
         signal(SIGUSR1, __sig_handler); /* reset it to this function */
-        printf("WEBPA SIGUSR1 received!\n");
+        SeshatInfo("WEBPA SIGUSR1 received!\n");
     }
     else if ( sig == SIGUSR2 ) {
-        printf("seshat SIGUSR2 received!\n");
+        SeshatInfo("seshat SIGUSR2 received!\n");
     }
     else if ( sig == SIGCHLD ) {
         signal(SIGCHLD, __sig_handler); /* reset it to this function */
-        printf("seshat SIGHLD received!\n");
+        SeshatInfo("seshat SIGHLD received!\n");
     }
     else if ( sig == SIGPIPE ) {
         signal(SIGPIPE, __sig_handler); /* reset it to this function */
-        printf("seshat SIGPIPE received!\n");
+        SeshatInfo("seshat SIGPIPE received!\n");
     }
     else if ( sig == SIGALRM ) {
         signal(SIGALRM, __sig_handler); /* reset it to this function */
-        printf("seshat SIGALRM received!\n");
+        SeshatInfo("seshat SIGALRM received!\n");
     }
     else if( sig == SIGTERM ) {
-      //  signal(SIGTERM, __terminate_listener);
-        printf("seshat SIGTERM received!\n");
+        SeshatInfo("seshat SIGTERM received!\n");
         _exit_process_(sig);
     }
     else {
-        printf("seshat Signal %d received!\n", sig);
+        SeshatInfo("seshat Signal %d received!\n", sig);
         _exit_process_(sig);
     }
 }
 
 void _exit_process_(int signum)
 {
-  printf("seshat ready to exit!\n");
+  SeshatInfo("seshat ready to exit!\n");
   signal(signum, SIG_DFL);
   kill(getpid(), signum);
 }
+
+const char *rdk_logger_module_fetch(void)
+{
+    return "LOG.RDK.Seshat";
+}
+

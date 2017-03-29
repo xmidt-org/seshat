@@ -18,6 +18,7 @@
 
 #include "listener_task.h"
 #include "wrp_interface.h"
+#include "seshat_log.h"
 
 /*----------------------------------------------------------------------------*/
 /*                             File Scoped Variables                          */
@@ -57,9 +58,10 @@ static void *listener(void *data)
     
     while( 1 ) {
         int in_size = nn_recv (in_data.socket, &in_buf, NN_MSG, 0);
-        printf("listener got %d bytes\n", in_size);
+        SeshatInfo("listener got %d bytes\n", in_size);
         if( 0 < in_size ) {
             ssize_t out_size = wi_create_response_to_message(in_buf, in_size, &out_buf);
+            SeshatInfo("listener to send %ld bytes\n", out_size);
             if( 0 < out_size ) {
                 if ( 0 > nn_send(in_data.socket, out_buf, out_size, 0) ) {
                     free(out_buf);
@@ -69,11 +71,11 @@ static void *listener(void *data)
         } 
         else {
             // do we need to check for socket error other than timed out ?
-            printf("listener timed out or socket error?\n");
+            SeshatPrint("listener timed out or socket error?\n");
             continue;
         }
         sleep(1);
-        printf("listener running\n");
+        SeshatPrint("listener running\n");
     }
     
     return NULL;
