@@ -52,22 +52,18 @@ void test_all( void )
     int seshat_pid;
     int seshat_service;
 #define SESHAT_URL "ipc:///tmp/sehsat_services.ipc"
-    const char *d_path = "./seshat_service";
+#define SESHAT_PATH_NAME  "../../src/seshat"  // FixMe: Can this be done by CMake?
     char *argv[] = {
-    "./seshat_service",
-    "-f", "foo.txt",
+    SESHAT_PATH_NAME,
+    "-f", "seshat_json.txt",
     "-u" , SESHAT_URL,
     NULL};
-    
-    /*
-     * AddMe:: start seshat_services and store PID
-     */
-    
+ 
     pid = fork();
     printf("test_all:Forked %d \n", pid);
     if (0 == pid) { // child process, run seshat service
         seshat_pid = getpid();
-        seshat_service = execv(d_path, argv);
+        seshat_service = execv(SESHAT_PATH_NAME, argv);
         
     } else {// test_all main process       
      // test init routine of the library
@@ -99,7 +95,6 @@ void test_all( void )
      */
     (void ) seshat_service;
     kill(seshat_pid, SIGKILL);
-    
 }
 
 void add_suites( CU_pSuite *suite )

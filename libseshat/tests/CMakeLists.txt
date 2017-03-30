@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-add_test(NAME Simple COMMAND simple)
+add_test(NAME simple COMMAND simple)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-error=missing-field-initializers -W -g -fprofile-arcs -ftest-coverage -O0")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W  -g -fprofile-arcs -ftest-coverage -O0")
@@ -26,3 +26,7 @@ target_link_libraries (simple  -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -luu
 target_link_libraries (simple gcov)
 target_link_libraries (simple cunit)
 target_link_libraries (simple rt)
+
+#-------------------------------------------------------------------------------
+
+
