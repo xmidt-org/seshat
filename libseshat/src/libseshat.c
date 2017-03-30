@@ -26,8 +26,7 @@
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
 #include <nanomsg/reqrep.h>
-// #include <uuid/uuid.h> Fails on travis build. Why?
-#include <uuid.h>
+#include <uuid/uuid.h>
 #include "libseshat.h"
 
 #include "wrp-c.h"
