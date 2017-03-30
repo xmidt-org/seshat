@@ -29,6 +29,7 @@ install:
     - sudo apt-get install -y -qq libcunit1 libcunit1-dev uuid-dev
 
 script:
+    - export ARGS="-VV --output-log /tmp/log.txt"
     - mkdir build
     - cd build
     - cmake ..
