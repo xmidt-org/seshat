@@ -45,18 +45,22 @@
 /*----------------------------------------------------------------------------*/
 /*                             Internal functions                             */
 /*----------------------------------------------------------------------------*/
+#define SESHAT_URL "ipc:///tmp/sehsat_services.ipc"
+#define SESHAT_PATH_NAME  "../../src/seshat"  // FixMe: Can this be done by CMake?
+#define FORK_SESHAT_SERVICES
+
 void test_all( void )
 {
     char *response;
+#ifdef FORK_SESHAT_SERVICES
     int pid;
     int seshat_pid;
     int seshat_service;
-#define SESHAT_URL "ipc:///tmp/sehsat_services.ipc"
-#define SESHAT_PATH_NAME  "../../src/seshat"  // FixMe: Can this be done by CMake?
+
     char *argv[] = {
     SESHAT_PATH_NAME,
     "-f", "seshat_json.txt",
-    "-u" , SESHAT_URL,
+    "-u" , SESHAT_URL, "-t", "60", // 60 sec lifetime
     NULL};
  
     pid = fork();
@@ -65,9 +69,11 @@ void test_all( void )
         seshat_pid = getpid();
         seshat_service = execv(SESHAT_PATH_NAME, argv);
         
-    } else {// test_all main process       
+    } else {// test_all main process     
+#endif // FORK_SESHAT_SERVICES
+        
      // test init routine of the library
-    sleep(2);
+    sleep(7);
     CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
     CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
     CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
@@ -87,14 +93,17 @@ void test_all( void )
     free(response);
     
     CU_ASSERT(0 == shutdown_seshat_lib());       
+#ifdef FORK_SESHAT_SERVICES
     }
-    
     
     /*
      * AddMe:: send_kill_signal_to_seshat_services();
      */
     (void ) seshat_service;
-    kill(seshat_pid, SIGKILL);
+    (void ) seshat_pid;
+   // kill(seshat_pid, SIGABRT);
+ #endif   
+   
 }
 
 void add_suites( CU_pSuite *suite )

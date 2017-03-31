@@ -102,7 +102,7 @@ char* seshat_discover( const char *service )
 /*                             Internal functions                             */
 /*----------------------------------------------------------------------------*/
 int init_lib_seshat(const char *url) {
-    int timeout_val = 5001; 
+    int timeout_val = 7001; 
  
     assert(url);
 
@@ -159,18 +159,22 @@ char *discover_service_data(const char *service)
     memset(uuid_str, 0, UUID_STRING_SIZE);
     uuid_generate_time_safe(uuid);
     uuid_unparse_lower(uuid, uuid_str);
-       
+    printf("discover_service_data() uuid string: %s\n", uuid_str);   
     if (send_message(WRP_MSG_TYPE__RETREIVE, service,
                      (const char *) NULL, uuid_str))
     {
         wrp_msg_t *msg = NULL;
+        printf("discover_service_data() waiting ...\n");
         if (0 == wait_for_reply(&msg, uuid_str)) {   
+            printf("discover_service_data() status %d, type %d\n", msg->u.crud.status, msg->msg_type);
             if (WRP_MSG_TYPE__RETREIVE == msg->msg_type && 
                 200 == msg->u.crud.status)
             {
               response = strdup(msg->u.crud.payload);
             }
             wrp_free_struct(msg);
+       } else {
+           printf("discover_service_data() Failed!!\n"); 
        }
     }
     
@@ -274,13 +278,17 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
     }
  
     if (NULL == uuid_str) {
+        printf("wait_for_reply(): No UUID Required, passed.\n");
         return 0;
     }
 
+    printf("wait_for_reply() transaction_uuid %s, type %d",
+           (*msg)->u.crud.transaction_uuid, (*msg)->msg_type);
+    
     if ((*msg)->u.crud.transaction_uuid && 
         (*msg)->u.crud.transaction_uuid[0] && 
-        strcmp(uuid_str, (*msg)->u.crud.transaction_uuid)) {
-      
+        (0 == strcmp(uuid_str, (*msg)->u.crud.transaction_uuid))) {
+        printf("wait_for_reply() Valid UUID\n");
         return 0;
     } else {
         wrp_free_struct(*msg);
