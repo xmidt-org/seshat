@@ -82,12 +82,13 @@ int seshat_register( const char *service, const char *url )
 {
     int result = -1;
     
-    assert(service && url && __current_url_);
+    if (service && url && __current_url_) {
+        result = register_service_(service, url);
+        errno = EAGAIN; // Need to set this appropriately
+    }
     
-    result = register_service_(service, url);
-    errno = EAGAIN; // Need to set this appropriately
-
     return result;
+    
 }
 
 /* See libseshat.h for details. */
@@ -160,7 +161,10 @@ char *discover_service_data(const char *service)
     char *uuid_str;
     char *response = NULL;
     
-    assert(service);
+    if (NULL == service) {
+            LibSeshatError(LOGGING_MODULE, "discover_service_data() null service!\n"); 
+            return response;
+    }
     
     uuid_str = (char *) malloc(UUID_STRING_SIZE);
     memset(uuid_str, 0, UUID_STRING_SIZE);

@@ -73,7 +73,12 @@ void test_all( void )
 #endif // FORK_SESHAT_SERVICES
         
      // test init routine of the library
-    sleep(7);
+    sleep(4);
+    
+    response = seshat_discover("WebPa1");
+    CU_ASSERT(NULL == response);
+    free(response);
+    
     CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
     CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
     CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
@@ -91,6 +96,9 @@ void test_all( void )
     response = seshat_discover("WebPa2");
     CU_ASSERT(NULL != response);
     free(response);
+ 
+    CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
+    
     
     CU_ASSERT(0 == shutdown_seshat_lib());       
 #ifdef FORK_SESHAT_SERVICES
