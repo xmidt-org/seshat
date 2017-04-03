@@ -12,17 +12,21 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-add_test(NAME Simple COMMAND simple)
+add_test(NAME seshat_e2e_test COMMAND simple_test)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-error=missing-field-initializers -W -g -fprofile-arcs -ftest-coverage -O0")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W  -g -fprofile-arcs -ftest-coverage -O0")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage -O0")
 
-add_executable(simple simple.c ../src/libseshat.c)
-set_property(TARGET simple PROPERTY C_STANDARD 99)
+add_executable(simple_test simple.c ../src/libseshat.c)
+set_property(TARGET simple_test PROPERTY C_STANDARD 99)
 
-target_link_libraries (simple  -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -luuid -lcimplog)
+target_link_libraries (simple_test  -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -luuid -lcimplog)
 
-target_link_libraries (simple gcov)
-target_link_libraries (simple cunit)
-target_link_libraries (simple rt)
+target_link_libraries (simple_test gcov)
+target_link_libraries (simple_test cunit)
+target_link_libraries (simple_test rt)
+
+#-------------------------------------------------------------------------------
+
+

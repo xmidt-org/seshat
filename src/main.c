@@ -24,6 +24,7 @@
 #include <getopt.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
+#include <time.h>
 #include "wrp-c.h"
 #include "nmsg.h"
 #include "listener_task.h"
@@ -33,7 +34,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-#define OPTIONS_STRING_FORMAT "u:f:"
+#define OPTIONS_STRING_FORMAT "u:f:t:"
 
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
@@ -46,6 +47,7 @@
 /* Notes: getopts is case-sensitive */
 static struct option command_line_options[] = {
     {"temp-file", required_argument, 0, 'f'},
+    {"termination-time", required_argument, 0, 't'}, // use only for unit test
     {"url", required_argument, 0, 'u'},
     {0,0,0,0}
 };
@@ -60,15 +62,20 @@ static void _exit_process_(int signum);
 int recv_socket; 
 listener_data_t the_data;
 
+static bool terminate_seshat;
+
 int main( int argc, char **argv)
 {
     int item;
     int options_index = 0;
     int timeout_val;
     int nn_err;
+    int lifetime = 0;
+    int time_passed = 0;
+    time_t start_time = time(&start_time);
     
     init_signal_handler();
-    
+    terminate_seshat = false;
     while (-1 != (item = getopt_long(argc, argv, OPTIONS_STRING_FORMAT,
                          command_line_options, &options_index)))
     {
@@ -80,6 +87,14 @@ int main( int argc, char **argv)
             case 'u':
                 // str_len = strlen(optarg);
                 url = strdup(optarg);
+                break;
+            case 't':
+            {
+                lifetime = atoi(optarg);
+                if (lifetime < 0) {
+                    lifetime = 0;
+                }
+            }
                 break;
         }    
     }
@@ -124,10 +139,23 @@ int main( int argc, char **argv)
 
     listener_thread_start(&the_data);   
         
-    while (1) {
+    while (false == terminate_seshat) {
+	static int cnt = 0;
         
-        SeshatPrint("main() waiting ...\n");
-        sleep(15);
+	if (0 == cnt++ % 5) {
+        	SeshatInfo("main() waiting ...lifetime %d, passed_time %d\n",
+ 	               (int ) lifetime, time_passed);
+	}
+        sleep(5);
+        if (lifetime > 0) {
+            time_t time_now = time(&time_now);
+            time_passed += time_now - start_time; 
+            SeshatInfo("seshat: main(): time_passed is %d\n", time_passed);
+            if ( lifetime <= time_passed ) {
+                SeshatInfo("Seshat: End of Life, so sooooooon ....\n");
+                break;
+            }
+        }
     }
     
     shutdown_receiver(recv_socket);
@@ -186,6 +214,9 @@ void __sig_handler(int sig)
     else if( sig == SIGTERM ) {
         SeshatInfo("seshat SIGTERM received!\n");
         _exit_process_(sig);
+    } else if ( sig == SIGABRT ) {
+         SeshatInfo("seshat SIGABRT received!\n");
+        _exit_process_(sig);       
     }
     else {
         SeshatInfo("seshat Signal %d received!\n", sig);
@@ -196,6 +227,8 @@ void __sig_handler(int sig)
 void _exit_process_(int signum)
 {
   SeshatInfo("seshat ready to exit!\n");
+  terminate_seshat = true;
+  sleep(1);
   signal(signum, SIG_DFL);
   kill(getpid(), signum);
 }
