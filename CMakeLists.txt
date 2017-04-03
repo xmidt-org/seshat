@@ -133,9 +133,9 @@ link_directories ( ${LIBRARY_DIR} ${LIBRARY_DIR64})
 
 add_subdirectory(src)
 add_subdirectory(libseshat/src)
-## add_subdirectory(libseshat/tests)
+add_subdirectory(libseshat/tests)
 
 if (BUILD_TESTING)
-##    add_subdirectory(tests)
+    add_subdirectory(tests)
     add_subdirectory(libseshat/tests)
 endif (BUILD_TESTING)
