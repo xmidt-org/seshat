@@ -26,7 +26,7 @@
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
 #include <nanomsg/reqrep.h>
-#include <uuid/uuid.h>
+#include <uuid/uuid.h> // Fedora build requires "libuuid-devel"
 #include "libseshat.h"
 
 #include "wrp-c.h"
