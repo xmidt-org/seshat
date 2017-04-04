@@ -1,0 +1,13 @@
+[Unit]
+Description=Starts seshatd service
+
+[Service]
+Environment="LOG4C_RCPATH=/rdklogger"
+ExecStart=/usr/bin/seshat -u tcp://192.168.101.3:7777
+Restart=always
+RestartSec=5
+StandardOutput=syslog+console
+
+[Install]
+WantedBy=multi-user.target
+
