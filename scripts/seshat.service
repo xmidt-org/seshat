@@ -1,5 +1,5 @@
 [Unit]
-Description=Starts seshatd service
+Description=Starts seshat service-discovery agent service
 
 [Service]
 Environment="LOG4C_RCPATH=/rdklogger"
