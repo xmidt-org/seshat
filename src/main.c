@@ -25,7 +25,7 @@
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
 #include <time.h>
-#include "wrp-c.h"
+#include <wrp-c/wrp-c.h>
 #include "nmsg.h"
 #include "listener_task.h"
 #include "json_interface.h"

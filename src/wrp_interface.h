@@ -14,7 +14,7 @@ extern "C" {
 #include <assert.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/pipeline.h>
-#include "wrp-c.h"
+#include <wrp-c/wrp-c.h>
 #include "nmsg.h"
     
 /*----------------------------------------------------------------------------*/
