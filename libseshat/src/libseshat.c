@@ -162,7 +162,7 @@ char *discover_service_data(const char *service)
     char *response = NULL;
     
     if (NULL == service) {
-            LibSeshatError(LOGGING_MODULE, "discover_service_data() null service!\n"); 
+            LibSeshatError("discover_service_data() null service!\n"); 
             return response;
     }
     
@@ -170,14 +170,14 @@ char *discover_service_data(const char *service)
     memset(uuid_str, 0, UUID_STRING_SIZE);
     uuid_generate_time_safe(uuid);
     uuid_unparse_lower(uuid, uuid_str);
-    LibSeshatInfo(LOGGING_MODULE, "discover_service_data() uuid string: %s\n", uuid_str);   
+    LibSeshatInfo("discover_service_data() uuid string: %s\n", uuid_str);   
     if (send_message(WRP_MSG_TYPE__RETREIVE, service,
                      (const char *) NULL, uuid_str))
     {
         wrp_msg_t *msg = NULL;
-        LibSeshatInfo(LOGGING_MODULE, "discover_service_data() waiting ...\n");
+        LibSeshatInfo("discover_service_data() waiting ...\n");
         if (0 == wait_for_reply(&msg, uuid_str)) {   
-            LibSeshatInfo(LOGGING_MODULE, "discover_service_data() status %d, type %d\n", msg->u.crud.status, msg->msg_type);
+            LibSeshatInfo("discover_service_data() status %d, type %d\n", msg->u.crud.status, msg->msg_type);
             if (WRP_MSG_TYPE__RETREIVE == msg->msg_type && 
                 200 == msg->u.crud.status)
             {
@@ -185,7 +185,7 @@ char *discover_service_data(const char *service)
             }
             wrp_free_struct(msg);
        } else {
-           LibSeshatError(LOGGING_MODULE, "discover_service_data() Failed!!\n"); 
+           LibSeshatError("discover_service_data() Failed!!\n"); 
        }
     }
     
@@ -256,7 +256,7 @@ bool send_message(int wrp_request, const char *service,
     }
     
     if ((bytes_sent =  nn_send(__scoket_handle_, payload_bytes, payload_size, 0)) > 0) {
-        LibSeshatInfo(LOGGING_MODULE, "libseshat: Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) payload_size);
+        LibSeshatInfo("libseshat: Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) payload_size);
     }
 
     return (bytes_sent == (int ) payload_size);
@@ -275,7 +275,7 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
     bytes = nn_recv (__scoket_handle_, &buf, NN_MSG, 0);
 
     if (0 >= bytes) {
-        LibSeshatError(LOGGING_MODULE, "wait_for_reply() nn_recv failed\n");
+        LibSeshatError("wait_for_reply() nn_recv failed\n");
         return -1;
     }
    
@@ -284,22 +284,22 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
     nn_freemsg(buf);
 
     if (0 >= wrp_len || (NULL == msg)) {
-        LibSeshatError(LOGGING_MODULE, "wait_for_reply() wrp_to_struct failed\n");        
+        LibSeshatError("wait_for_reply() wrp_to_struct failed\n");        
         return -1;
     }
  
     if (NULL == uuid_str) {
-        LibSeshatInfo(LOGGING_MODULE, "wait_for_reply(): No UUID Required, passed.\n");
+        LibSeshatInfo("wait_for_reply(): No UUID Required, passed.\n");
         return 0;
     }
 
-    LibSeshatInfo(LOGGING_MODULE, "wait_for_reply() transaction_uuid %s, type %d",
+    LibSeshatInfo("wait_for_reply() transaction_uuid %s, type %d",
            (*msg)->u.crud.transaction_uuid, (*msg)->msg_type);
     
     if ((*msg)->u.crud.transaction_uuid && 
         (*msg)->u.crud.transaction_uuid[0] && 
         (0 == strcmp(uuid_str, (*msg)->u.crud.transaction_uuid))) {
-        LibSeshatInfo(LOGGING_MODULE, "wait_for_reply() Valid UUID\n");
+        LibSeshatInfo("wait_for_reply() Valid UUID\n");
         return 0;
     } else {
         wrp_free_struct(*msg);
