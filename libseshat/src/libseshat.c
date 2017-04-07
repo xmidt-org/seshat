@@ -116,9 +116,11 @@ int init_lib_seshat(const char *url) {
 
     if (NULL != __current_url_) {
         if (0 == strcmp(url, __current_url_)) {
+            LibSeshatInfo(LOGGING_MODULE, "init_lib_seshat: Already Initialized!\n");
             return 0; 
         } 
         
+        LibSeshatError(LOGGING_MODULE, "init_lib_seshat: Re-Init with different URL not allowed!\n");
         return -1;
     } 
     
@@ -229,10 +231,10 @@ bool send_message(int wrp_request, const char *service,
     switch (wrp_request) {
         case WRP_MSG_TYPE__RETREIVE:
             msg->u.crud.path = strdup(service);
-            msg->u.crud.transaction_uuid = strdup(uuid);
-            msg->u.crud.source  = strdup("lib://libseshat");
-            msg->u.crud.dest    = strdup(__current_url_);
-            msg->u.crud.payload = strdup(service);
+            msg->u.crud.transaction_uuid = uuid;
+            msg->u.crud.source  = (char *) "lib://libseshat";
+            msg->u.crud.dest    = (char *) __current_url_;
+            msg->u.crud.payload = (char *) service;
             
             break;
         case WRP_MSG_TYPE__SVC_REGISTRATION:
