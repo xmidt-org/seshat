@@ -116,9 +116,11 @@ int init_lib_seshat(const char *url) {
 
     if (NULL != __current_url_) {
         if (0 == strcmp(url, __current_url_)) {
+            LibSeshatInfo(LOGGING_MODULE, "init_lib_seshat: Already Initialized!\n");
             return 0; 
         } 
         
+        LibSeshatError(LOGGING_MODULE, "init_lib_seshat: Re-Init with different URL not allowed!\n");
         return -1;
     } 
     
