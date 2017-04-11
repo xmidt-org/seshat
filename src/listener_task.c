@@ -61,7 +61,7 @@ static void *listener(void *data)
         SeshatInfo("listener got %d bytes\n", in_size);
         if( 0 < in_size ) {
             ssize_t out_size = wi_create_response_to_message(in_buf, in_size, &out_buf);
-            SeshatInfo("listener to send %ld bytes\n", out_size);
+            SeshatInfo("listener to send %zd bytes\n", out_size);
             if( 0 < out_size ) {
                 if ( 0 > nn_send(in_data.socket, out_buf, out_size, 0) ) {
                     free(out_buf);
