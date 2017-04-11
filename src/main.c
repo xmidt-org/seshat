@@ -149,7 +149,7 @@ int main( int argc, char **argv)
         sleep(5);
         if (lifetime > 0) {
             time_t time_now = time(&time_now);
-            time_passed += time_now - start_time; 
+            time_passed = time_now - start_time; 
             SeshatInfo("seshat: main(): time_passed is %d\n", time_passed);
             if ( lifetime <= time_passed ) {
                 SeshatInfo("Seshat: End of Life, so sooooooon ....\n");
