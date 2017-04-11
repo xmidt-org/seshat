@@ -230,7 +230,7 @@ bool send_message(int wrp_request, const char *service,
     
     switch (wrp_request) {
         case WRP_MSG_TYPE__RETREIVE:
-            msg->u.crud.path = strdup(service);
+            msg->u.crud.path = (char *) service;
             msg->u.crud.transaction_uuid = uuid;
             msg->u.crud.source  = (char *) "lib://libseshat";
             msg->u.crud.dest    = (char *) __current_url_;
