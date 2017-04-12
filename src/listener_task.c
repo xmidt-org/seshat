@@ -64,8 +64,9 @@ static void *listener(void *data)
             SeshatInfo("listener to send %zd bytes\n", out_size);
             if( 0 < out_size ) {
                 if ( 0 > nn_send(in_data.socket, out_buf, out_size, 0) ) {
-                    free(out_buf);
+                    SeshatError("listener()->nn_send() Failed");
                 }
+                free(out_buf);
             }
             nn_freemsg(in_buf);
         } 
