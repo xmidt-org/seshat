@@ -62,7 +62,7 @@ void test_all( void )
     time_t start_time;
     int cli_time_out_value = atoi(time_out_value_string);
     
-    max_counter =  cli_time_out_value / 10;
+    max_counter =  cli_time_out_value / 8;
     
     if (max_counter < 6) {
         max_counter = 6;
@@ -104,8 +104,10 @@ void test_all( void )
             sprintf(test_service, "WepPa1_%d", cnt);
             CU_ASSERT(0 == seshat_register(test_service, test_url));
             response = seshat_discover(test_service);
-            CU_ASSERT(0 != strstr(response, test_url));
-            free(response);
+            if (response) {
+                CU_ASSERT(0 != strstr(response, test_url));
+                free(response);
+            }
             CU_ASSERT(0 == seshat_register(test_service, test_url));
 
             CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
