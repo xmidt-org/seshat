@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
 #include <CUnit/Basic.h>
 
 #include "../src/libseshat.h"
@@ -48,20 +49,30 @@
 /*----------------------------------------------------------------------------*/
 #define SESHAT_URL "ipc:///tmp/sehsat_services.ipc"
 #define SESHAT_PATH_NAME  "../../src/seshat"  // FixMe: Can this be done by CMake?
-#define FORK_SESHAT_SERVICES
+static char time_out_value_string[64];
+
 
 void test_all( void )
 {
     char *response;
-#ifdef FORK_SESHAT_SERVICES
     int pid;
     int seshat_pid;
     int seshat_service;
-
+    int cnt = 0;
+    int max_counter;
+    time_t start_time;
+    int cli_time_out_value = atoi(time_out_value_string);
+    
+    max_counter =  cli_time_out_value / 10;
+    
+    if (max_counter < 6) {
+        max_counter = 6;
+    }
+    
     char *argv[] = {
     SESHAT_PATH_NAME,
     "-f", "seshat_json.txt",
-    "-u" , SESHAT_URL, "-t", "60", // 60 sec lifetime
+    "-u" , SESHAT_URL, "-t", time_out_value_string, // lifetime in seconds
     NULL};
  
     pid = fork();
@@ -69,49 +80,55 @@ void test_all( void )
     if (0 == pid) { // child process, run seshat service
         seshat_pid = getpid();
         seshat_service = execv(SESHAT_PATH_NAME, argv);
-        
-    } else {// test_all main process     
-#endif // FORK_SESHAT_SERVICES
-        
-     // test init routine of the library
-    sleep(4);
-    
-    response = seshat_discover("WebPa1");
-    CU_ASSERT(NULL == response);
-    free(response);
-    
-    CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
-    CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
-    CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
-    
-    CU_ASSERT(NULL == seshat_discover("WebPa"));    
-    
-    CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
-    CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
-    response = seshat_discover("WebPa1");
-    CU_ASSERT(NULL != response);
-    free(response);
-    
-    CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));
-    CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));     
-    response = seshat_discover("WebPa2");
-    CU_ASSERT(NULL != response);
-    free(response);
- 
-    CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
-    
-    
-    CU_ASSERT(0 == shutdown_seshat_lib());       
-#ifdef FORK_SESHAT_SERVICES
     }
+    else {// main process             
+        sleep(4);
+        start_time = time(&start_time);
+
+        for (cnt = 0; cnt < max_counter; cnt++) {
+            char test_buffer[64];
+
+            sprintf(test_buffer, "WebPa1%d", cnt);
+            response = seshat_discover(test_buffer);
+            CU_ASSERT(NULL == response);
+            free(response);
+
+            CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
+            CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
+            CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
+
+            CU_ASSERT(NULL == seshat_discover("WebPa"));    
+
+            CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
+            CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
+            response = seshat_discover("WebPa1");
+            CU_ASSERT(NULL != response);
+            free(response);
+
+            CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));
+            CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));     
+            response = seshat_discover("WebPa2");
+            CU_ASSERT(NULL != response);
+            free(response);
+
+            CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
+
+
+            CU_ASSERT(0 == shutdown_seshat_lib());       
+
+            if (cli_time_out_value > 0) {
+                time_t time_now = time(&time_now);
+                if ( cli_time_out_value <= (time_now - start_time) ) {
+                    printf("seshatlib: Ending test\n");
+                    break;
+                }
+            }
+        }
+
+        } // main process exits
     
-    /*
-     * AddMe:: send_kill_signal_to_seshat_services();
-     */
     (void ) seshat_service;
-    (void ) seshat_pid;
-   // kill(seshat_pid, SIGABRT);
- #endif   
+    (void ) seshat_pid;    
    
 }
 
@@ -124,10 +141,18 @@ void add_suites( CU_pSuite *suite )
 /*----------------------------------------------------------------------------*/
 /*                             External Functions                             */
 /*----------------------------------------------------------------------------*/
-int main( void )
+int main( int argc, char **argv )
 {
     unsigned rv = 1;
     CU_pSuite suite = NULL;
+    
+    if (argc > 1) {
+        snprintf(time_out_value_string, 63, "%s", argv[1]);
+    } else {
+        sprintf(time_out_value_string, "60");
+    }
+    
+    printf("time_out_value_string %s\n", time_out_value_string);
 
     if( CUE_SUCCESS == CU_initialize_registry() ) {
         add_suites( &suite );
