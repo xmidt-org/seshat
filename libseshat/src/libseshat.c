@@ -78,6 +78,7 @@ int shutdown_seshat_lib (void)
 }
 
 /* See libseshat.h for details. */
+/* returns 0 on success */
 int seshat_register( const char *service, const char *url )
 {
     int result = -1;

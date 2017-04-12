@@ -86,6 +86,8 @@ void test_all( void )
 
         for (cnt = 0; cnt < max_counter; cnt++) {
             char test_buffer[64];
+            char test_url[256];
+            char test_service[32];
 
             sprintf(test_buffer, "WebPa1%d", cnt);
             response = seshat_discover(test_buffer);
@@ -97,23 +99,16 @@ void test_all( void )
             CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
 
             CU_ASSERT(NULL == seshat_discover("WebPa"));    
-
-            CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
-            CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
-            response = seshat_discover("WebPa1");
-            CU_ASSERT(NULL != response);
+            
+            sprintf(test_url, "https://WebPa1.comcast.com/webpa_%d", cnt);
+            sprintf(test_service, "WepPa1_%d", cnt);
+            CU_ASSERT(0 == seshat_register(test_service, test_url));
+            response = seshat_discover(test_service);
+            CU_ASSERT(0 != strstr(response, test_url));
             free(response);
-
-            CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));
-            CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));     
-            response = seshat_discover("WebPa2");
-            CU_ASSERT(NULL != response);
-            free(response);
+            CU_ASSERT(0 == seshat_register(test_service, test_url));
 
             CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
-
-
-            CU_ASSERT(0 == shutdown_seshat_lib());       
 
             if (cli_time_out_value > 0) {
                 time_t time_now = time(&time_now);
@@ -125,7 +120,9 @@ void test_all( void )
         }
 
         } // main process exits
-    
+ 
+    CU_ASSERT(0 == shutdown_seshat_lib());       
+
     (void ) seshat_service;
     (void ) seshat_pid;    
    
