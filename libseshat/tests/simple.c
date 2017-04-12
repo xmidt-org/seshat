@@ -84,8 +84,11 @@ void test_all( void )
         sleep(4);
         start_time = time(&start_time);
 
-        for (cnt = 0; cnt < max_counter; cnt++) {        
-            response = seshat_discover("WebPa1");
+        for (cnt = 0; cnt < max_counter; cnt++) {
+            char test_buffer[64];
+
+            sprintf(test_buffer, "WebPa1%d", cnt);
+            response = seshat_discover(test_buffer);
             CU_ASSERT(NULL == response);
             free(response);
 
