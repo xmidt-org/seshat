@@ -99,9 +99,9 @@ char *seshat_discover( const char *service )
     
     if (lib_seshat_is_initialized()) {
         if (NULL != (response = discover_service_data(service))) {
-                errno = EAGAIN; // ?? Who should set this
+                errno = 0; 
         } else {
-            errno = 0;
+            errno = EAGAIN;
         }
     }
 
@@ -192,6 +192,7 @@ char *discover_service_data(const char *service)
        }
     }
     
+    free(uuid_str);
     return response;
 }
 
@@ -210,10 +211,12 @@ int register_service_(const char *service, const char *url)
         {
             result = true;
         }
-        
-        wrp_free_struct(msg);
     }    
    
+    if (msg) {
+       wrp_free_struct(msg);
+    }
+    
     return (result ? 0 : -1);
 }
 
@@ -262,6 +265,8 @@ bool send_message(int wrp_request, const char *service,
         LibSeshatInfo("libseshat: Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) payload_size);
     }
 
+    free(payload_bytes);
+    
     return (bytes_sent == (int ) payload_size);
 }
 
@@ -273,7 +278,8 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
 {
     int bytes;
     ssize_t wrp_len;
-    char *buf;
+    char *buf;    
+    *msg = NULL;
     
     bytes = nn_recv (__scoket_handle_, &buf, NN_MSG, 0);
 
@@ -283,9 +289,9 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
     }
    
     wrp_len = wrp_to_struct ( buf, bytes, WRP_BYTES, msg);
-    
+   
     nn_freemsg(buf);
-
+   
     if (0 >= wrp_len || (NULL == msg)) {
         LibSeshatError("wait_for_reply() wrp_to_struct failed\n");        
         return -1;
@@ -306,9 +312,8 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
         return 0;
     } else {
         wrp_free_struct(*msg);
+        *msg = NULL;
     }
-
-   free(uuid_str);
    
    return -1;   
 }
