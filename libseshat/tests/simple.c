@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
 #include <CUnit/Basic.h>
 
 #include "../src/libseshat.h"
@@ -58,8 +59,10 @@ void test_all( void )
     int seshat_service;
     int cnt = 0;
     int max_counter;
-
-    max_counter = atoi(time_out_value_string) / 10;
+    time_t start_time;
+    int cli_time_out_value = atoi(time_out_value_string);
+    
+    max_counter =  cli_time_out_value / 10;
     
     if (max_counter < 6) {
         max_counter = 6;
@@ -76,39 +79,49 @@ void test_all( void )
     if (0 == pid) { // child process, run seshat service
         seshat_pid = getpid();
         seshat_service = execv(SESHAT_PATH_NAME, argv);
-    } else {// main process             
-    sleep(4);
-
-    for (cnt = 0; cnt < max_counter; cnt++) {        
-        response = seshat_discover("WebPa1");
-        CU_ASSERT(NULL == response);
-        free(response);
-
-        CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
-        CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
-        CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
-
-        CU_ASSERT(NULL == seshat_discover("WebPa"));    
-
-        CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
-        CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
-        response = seshat_discover("WebPa1");
-        CU_ASSERT(NULL != response);
-        free(response);
-
-        CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));
-        CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));     
-        response = seshat_discover("WebPa2");
-        CU_ASSERT(NULL != response);
-        free(response);
-
-        CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
-
-
-        CU_ASSERT(0 == shutdown_seshat_lib());       
     }
+    else {// main process             
+        sleep(4);
+        start_time = time(&start_time);
 
-    } // main process exits
+        for (cnt = 0; cnt < max_counter; cnt++) {        
+            response = seshat_discover("WebPa1");
+            CU_ASSERT(NULL == response);
+            free(response);
+
+            CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
+            CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
+            CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
+
+            CU_ASSERT(NULL == seshat_discover("WebPa"));    
+
+            CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
+            CU_ASSERT(0 == seshat_register("WebPa1", "https://WebPa1.comcast.com/webpa_"));
+            response = seshat_discover("WebPa1");
+            CU_ASSERT(NULL != response);
+            free(response);
+
+            CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));
+            CU_ASSERT(0 == seshat_register("WebPa2", "https://WebPa2.comcast.com/webpa_"));     
+            response = seshat_discover("WebPa2");
+            CU_ASSERT(NULL != response);
+            free(response);
+
+            CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));     
+
+
+            CU_ASSERT(0 == shutdown_seshat_lib());       
+
+            if (cli_time_out_value > 0) {
+                time_t time_now = time(&time_now);
+                if ( cli_time_out_value <= (time_now - start_time) ) {
+                    printf("seshatlib: Ending test\n");
+                    break;
+                }
+            }
+        }
+
+        } // main process exits
     
     (void ) seshat_service;
     (void ) seshat_pid;    
