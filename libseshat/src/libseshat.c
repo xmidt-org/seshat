@@ -292,7 +292,7 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
    
     nn_freemsg(buf);
    
-    if (0 >= wrp_len || (NULL == msg)) {
+    if (0 >= wrp_len || (NULL == *msg)) {
         LibSeshatError("wait_for_reply() wrp_to_struct failed\n");        
         return -1;
     }
