@@ -143,7 +143,7 @@ add_dependencies(libwrp-c wrp-c)
 endif ()
 endif ()
 
-link_directories ( ${LIBRARY_DIR} ${LIBRARY_DIR64} ${COMMON_LIBRARY_DIR} ${MAIN_PROJ_LIB_PATH})
+link_directories ( ${LIBRARY_DIR} ${LIBRARY_DIR64} ${COMMON_LIBRARY_DIR} ${MAIN_PROJ_COMMON_PATH} ${MAIN_PROJ_LIB_PATH} ${MAIN_PROJ_LIB64_PATH} )
 
 add_subdirectory(src)
 add_subdirectory(libseshat/src)
