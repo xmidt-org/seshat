@@ -17,4 +17,8 @@
 
 #define SeshatError(...)   cimplog_error(LOGGING_MODULE, __VA_ARGS__)
 #define SeshatInfo(...)    cimplog_info(LOGGING_MODULE, __VA_ARGS__)
+#if BUILD_YOCTO
+#define SeshatPrint(...)   (void)0
+#else
 #define SeshatPrint(...)   cimplog_debug(LOGGING_MODULE, __VA_ARGS__)
+#endif 

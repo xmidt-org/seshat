@@ -58,7 +58,7 @@ static void *listener(void *data)
     
     while( 1 ) {
         int in_size = nn_recv (in_data.socket, &in_buf, NN_MSG, 0);
-        SeshatInfo("listener got %d bytes\n", in_size);
+        SeshatPrint("listener got %d bytes\n", in_size);
         if( 0 < in_size ) {
             ssize_t out_size = wi_create_response_to_message(in_buf, in_size, &out_buf);
             SeshatInfo("listener to send %zd bytes\n", out_size);
