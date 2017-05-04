@@ -77,6 +77,8 @@ int shutdown_seshat_lib (void)
     int rv = nn_shutdown(__socket_handle_, __end_point_);
     free(__current_url_);
     __current_url_ = NULL;
+    __socket_handle_ = -1;
+    __end_point_     = -1;
 
     return rv;
 }
@@ -140,14 +142,19 @@ int init_lib_seshat(const char *url)
             &timeout_val, sizeof(timeout_val))) {
         free(__current_url_);
         __current_url_ = NULL;
+        __socket_handle_ = -1;
+        __end_point_     = -1;
         return -1;
     }
 
     __end_point_ = nn_connect(__socket_handle_, __current_url_);
+    printf("!!!nn_connect returns %d!!!\n", __end_point_);
     if (0 > __end_point_) {
         nn_shutdown(__socket_handle_, 0);
         free(__current_url_);
         __current_url_ = NULL;
+        __socket_handle_ = -1;
+        __end_point_     = -1;
         return -1;
     }
 
