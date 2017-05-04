@@ -54,6 +54,7 @@
 /*----------------------------------------------------------------------------*/
 static char *__current_url_ = NULL;
 static int __scoket_handle_ = -1;
+static int __end_point_     = -1;
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
@@ -70,11 +71,14 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str);
 /*----------------------------------------------------------------------------*/
 /*                             External Functions                             */
 /*----------------------------------------------------------------------------*/
+/* See libseshat.h for details. */
 int shutdown_seshat_lib (void)
 {
-    // Implement me!!
-    
-    return 0;
+    int rv = nn_shutdown(__scoket_handle_, __end_point_);
+    free(__current_url_);
+    __current_url_ = NULL;
+
+    return rv;
 }
 
 /* See libseshat.h for details. */
@@ -139,7 +143,8 @@ int init_lib_seshat(const char *url) {
         return -1;
     }    
     
-    if (nn_connect(__scoket_handle_, __current_url_) < 0) {
+    __end_point_ = nn_connect(__scoket_handle_, __current_url_);
+    if (0 > __end_point_) {
         nn_shutdown(__scoket_handle_, 0);
         free(__current_url_);
         __current_url_ = NULL;
