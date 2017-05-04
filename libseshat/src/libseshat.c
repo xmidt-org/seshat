@@ -53,7 +53,8 @@
 /*                            File Scoped Variables                           */
 /*----------------------------------------------------------------------------*/
 static char *__current_url_ = NULL;
-static int __scoket_handle_ = -1;
+static int __socket_handle_ = -1;
+static int __end_point_     = -1;
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
@@ -70,11 +71,14 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str);
 /*----------------------------------------------------------------------------*/
 /*                             External Functions                             */
 /*----------------------------------------------------------------------------*/
+/* See libseshat.h for details. */
 int shutdown_seshat_lib (void)
 {
-    // Implement me!!
-    
-    return 0;
+    int rv = nn_shutdown(__socket_handle_, __end_point_);
+    free(__current_url_);
+    __current_url_ = NULL;
+
+    return rv;
 }
 
 /* See libseshat.h for details. */
@@ -107,53 +111,56 @@ char *seshat_discover( const char *service )
 
     return response;
 }
-/*----------------------------------------------------------------------------*/
-/*                             Internal functions                             */
-/*----------------------------------------------------------------------------*/
-int init_lib_seshat(const char *url) {
-    int timeout_val = 7001; 
- 
+
+/* See libseshat.h for details. */
+int init_lib_seshat(const char *url)
+{
+    int timeout_val = 7001;
+
     assert(url);
 
     if (NULL != __current_url_) {
         if (0 == strcmp(url, __current_url_)) {
             LibSeshatInfo("init_lib_seshat: Already Initialized!\n");
-            return 0; 
-        } 
-        
+            return 0;
+        }
+
         LibSeshatError("init_lib_seshat: Re-Init with different URL not allowed!\n");
         return -1;
-    } 
-    
-    
+    }
+
+
     __current_url_ = strdup(url);
-    
-    __scoket_handle_ = nn_socket(AF_SP, NN_REQ);
-    
-    assert(__scoket_handle_ >= 0);
-    
-    if (0 != nn_setsockopt (__scoket_handle_, NN_SOL_SOCKET, NN_RCVTIMEO,
+
+    __socket_handle_ = nn_socket(AF_SP, NN_REQ);
+
+    assert(__socket_handle_ >= 0);
+
+    if (0 != nn_setsockopt (__socket_handle_, NN_SOL_SOCKET, NN_RCVTIMEO,
             &timeout_val, sizeof(timeout_val))) {
         free(__current_url_);
         __current_url_ = NULL;
         return -1;
-    }    
-    
-    if (nn_connect(__scoket_handle_, __current_url_) < 0) {
-        nn_shutdown(__scoket_handle_, 0);
+    }
+
+    __end_point_ = nn_connect(__socket_handle_, __current_url_);
+    if (0 > __end_point_) {
+        nn_shutdown(__socket_handle_, 0);
         free(__current_url_);
         __current_url_ = NULL;
         return -1;
-    }    
-    
+    }
+
     return 0;
 }
 
-
+/*----------------------------------------------------------------------------*/
+/*                             Internal functions                             */
+/*----------------------------------------------------------------------------*/
 bool lib_seshat_is_initialized(void)
 {
     
-    return (__current_url_ && __scoket_handle_ >= 0);
+    return (__current_url_ && __socket_handle_ >= 0);
     
 }
 
@@ -261,7 +268,7 @@ bool send_message(int wrp_request, const char *service,
         return false;
     }
     
-    if ((bytes_sent =  nn_send(__scoket_handle_, payload_bytes, payload_size, 0)) > 0) {
+    if ((bytes_sent =  nn_send(__socket_handle_, payload_bytes, payload_size, 0)) > 0) {
         LibSeshatInfo("libseshat: Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) payload_size);
     }
 
@@ -281,7 +288,7 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
     char *buf;    
     *msg = NULL;
     
-    bytes = nn_recv (__scoket_handle_, &buf, NN_MSG, 0);
+    bytes = nn_recv (__socket_handle_, &buf, NN_MSG, 0);
 
     if (0 >= bytes) {
         LibSeshatError("wait_for_reply() nn_recv failed\n");
