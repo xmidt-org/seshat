@@ -54,7 +54,7 @@ static char time_out_value_string[64];
 
 void test_all( void )
 {
-    char *response;
+    char *url;
     int pid;
     int seshat_pid;
     int seshat_service;
@@ -91,9 +91,9 @@ void test_all( void )
             char test_service[32];
 
             sprintf(test_buffer, "WebPa1%d", cnt);
-            response = seshat_discover(test_buffer);
-            CU_ASSERT(NULL == response);
-            free(response);
+            url = seshat_discover(test_buffer);
+            CU_ASSERT(NULL == url);
+            free(url);
 
             CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
             CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
@@ -104,10 +104,10 @@ void test_all( void )
             sprintf(test_url, "https://WebPa1.comcast.com/webpa_%d", cnt);
             sprintf(test_service, "WepPa1_%d", cnt);
             CU_ASSERT(0 == seshat_register(test_service, test_url));
-            response = seshat_discover(test_service);
-            if (response) {
-                CU_ASSERT(0 != strstr(response, test_url));
-                free(response);
+            url = seshat_discover(test_service);
+            if (url) {
+                CU_ASSERT(0 == strcmp(url, test_url));
+                free(url);
             }
             CU_ASSERT(0 == seshat_register(test_service, test_url));
 
@@ -131,10 +131,50 @@ void test_all( void )
    
 }
 
+void test_none( void )
+{
+    char *url;
+    int seshat_pid;
+    int seshat_service;
+    int cnt = 0;
+    char test_buffer[64];
+    char test_url[256];
+    char test_service[32];
+
+    sprintf(test_buffer, "WebPa01");
+    url = seshat_discover(test_buffer);
+    CU_ASSERT(NULL == url);
+    free(url);
+
+    CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
+    CU_ASSERT(0 == init_lib_seshat(SESHAT_URL));
+    CU_ASSERT(0 != init_lib_seshat("ipc:///tmp/foo1.ipc"));
+
+    CU_ASSERT(NULL == seshat_discover("WebPa"));
+
+    sprintf(test_url, "https://WebPa1.comcast.com/webpa_%d", cnt);
+    sprintf(test_service, "WepPa1_%d", cnt);
+    CU_ASSERT(0 == seshat_register(test_service, test_url));
+    url = seshat_discover(test_service);
+    if (url) {
+        CU_ASSERT(0 == strcmp(url, test_url));
+        free(url);
+    }
+    CU_ASSERT(0 == seshat_register(test_service, test_url));
+
+    CU_ASSERT(0 != seshat_register(NULL, "https://WebPa2.comcast.com/webpa_"));
+
+    CU_ASSERT(0 == shutdown_seshat_lib());
+
+    (void ) seshat_service;
+    (void ) seshat_pid;
+}
+
 void add_suites( CU_pSuite *suite )
 {
     *suite = CU_add_suite( "libseshat tests", NULL, NULL );
     CU_add_test( *suite, "Test all", test_all );
+    CU_add_test( *suite, "Test none", test_none );
 }
 
 /*----------------------------------------------------------------------------*/

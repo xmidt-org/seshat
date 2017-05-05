@@ -42,8 +42,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-/* none */
 #define UUID_STRING_SIZE (36 + 2) // make it even boundary (vs 36 + 1)
+#define URL_SUBSTR_MARKER      "\"url\":"
+
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
@@ -77,6 +78,8 @@ int shutdown_seshat_lib (void)
     int rv = nn_shutdown(__socket_handle_, __end_point_);
     free(__current_url_);
     __current_url_ = NULL;
+    __socket_handle_ = -1;
+    __end_point_     = -1;
 
     return rv;
 }
@@ -100,16 +103,27 @@ int seshat_register( const char *service, const char *url )
 char *seshat_discover( const char *service )
 {
     char *response = NULL;
+    char *url = NULL;
     
     if (lib_seshat_is_initialized()) {
         if (NULL != (response = discover_service_data(service))) {
-                errno = 0; 
+            char *substr = strstr(response, URL_SUBSTR_MARKER);
+            if (NULL != substr) {
+                substr += sizeof(URL_SUBSTR_MARKER);
+                char *end = strstr(substr, "\"");
+                if (NULL != end) {
+                    size_t size = (size_t)(end - substr);
+                    url = strndup(substr, size);
+                }
+            }
+            free(response);
+            errno = 0; 
         } else {
             errno = EAGAIN;
         }
     }
 
-    return response;
+    return url;
 }
 
 /* See libseshat.h for details. */
@@ -140,6 +154,8 @@ int init_lib_seshat(const char *url)
             &timeout_val, sizeof(timeout_val))) {
         free(__current_url_);
         __current_url_ = NULL;
+        __socket_handle_ = -1;
+        __end_point_     = -1;
         return -1;
     }
 
@@ -148,6 +164,8 @@ int init_lib_seshat(const char *url)
         nn_shutdown(__socket_handle_, 0);
         free(__current_url_);
         __current_url_ = NULL;
+        __socket_handle_ = -1;
+        __end_point_     = -1;
         return -1;
     }
 
