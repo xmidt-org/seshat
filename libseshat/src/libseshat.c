@@ -108,13 +108,12 @@ char *seshat_discover( const char *service )
     if (lib_seshat_is_initialized()) {
         if (NULL != (response = discover_service_data(service))) {
             char *substr = strstr(response, URL_SUBSTR_MARKER);
-            substr += sizeof(URL_SUBSTR_MARKER);
             if (NULL != substr) {
-                char *end = strstr(substr, "\"}");
+                substr += sizeof(URL_SUBSTR_MARKER);
+                char *end = strstr(substr, "\"");
                 if (NULL != end) {
                     size_t size = (size_t)(end - substr);
                     url = strndup(substr, size);
-                    url[size] = '\0';
                 }
             }
             free(response);
