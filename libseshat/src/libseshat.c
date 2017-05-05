@@ -42,8 +42,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
 /*----------------------------------------------------------------------------*/
-/* none */
 #define UUID_STRING_SIZE (36 + 2) // make it even boundary (vs 36 + 1)
+#define URL_SUBSTR_MARKER      "\"url\":"
+
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
@@ -102,16 +103,28 @@ int seshat_register( const char *service, const char *url )
 char *seshat_discover( const char *service )
 {
     char *response = NULL;
+    char *url = NULL;
     
     if (lib_seshat_is_initialized()) {
         if (NULL != (response = discover_service_data(service))) {
-                errno = 0; 
+            char *substr = strstr(response, URL_SUBSTR_MARKER);
+            substr += sizeof(URL_SUBSTR_MARKER);
+            if (NULL != substr) {
+                char *end = strstr(substr, "\"}");
+                if (NULL != end) {
+                    size_t size = (size_t)(end - substr);
+                    url = strndup(substr, size);
+                    url[size] = '\0';
+                }
+            }
+            free(response);
+            errno = 0; 
         } else {
             errno = EAGAIN;
         }
     }
 
-    return response;
+    return url;
 }
 
 /* See libseshat.h for details. */
@@ -148,7 +161,6 @@ int init_lib_seshat(const char *url)
     }
 
     __end_point_ = nn_connect(__socket_handle_, __current_url_);
-    printf("!!!nn_connect returns %d!!!\n", __end_point_);
     if (0 > __end_point_) {
         nn_shutdown(__socket_handle_, 0);
         free(__current_url_);
