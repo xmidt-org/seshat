@@ -1,6 +1,6 @@
 # seshat
 
-nanomsg and wrp service discovery agent
+Nanomsg and wrp service discovery agent. It is a means for parodus or any other component to register itself in order for another component interested in parodus to lookup.
 
 [![Build Status](https://travis-ci.org/Comcast/seshat.svg?branch=master)](https://travis-ci.org/Comcast/seshat)
 [![codecov.io](http://codecov.io/github/Comcast/seshat/coverage.svg?branch=master)](http://codecov.io/github/Comcast/seshat?branch=master)
