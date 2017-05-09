@@ -126,6 +126,7 @@ add_dependencies(libcimplog cimplog)
 # wrp-c external dependency
 #-------------------------------------------------------------------------------
 ExternalProject_Add(wrp-c
+	DEPENDS msgpack
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/wrp-c
     GIT_REPOSITORY https://github.com/Comcast/wrp-c.git
     GIT_TAG "master"
