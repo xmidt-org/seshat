@@ -148,6 +148,9 @@ int init_lib_seshat(const char *url)
 
     __socket_handle_ = nn_socket(AF_SP, NN_REQ);
 
+    if( 0 > __socket_handle_ ) {
+        LibSeshatError("nn_socket returned failure (%d): %s\n", __socket_handle_, strerror(errno));
+    }
     assert(__socket_handle_ >= 0);
 
     if (0 != nn_setsockopt (__socket_handle_, NN_SOL_SOCKET, NN_RCVTIMEO,
