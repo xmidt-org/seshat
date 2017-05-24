@@ -153,6 +153,10 @@ int init_lib_seshat(const char *url)
 
     if( 0 > __socket_handle_ ) {
         LibSeshatError("nn_socket returned failure (%d): %s\n", __socket_handle_, strerror(errno));
+        free(__current_url_);
+        __current_url_ = NULL;
+        __socket_handle_ = -1;
+        __end_point_     = -1;
         return -3;
     }
 
