@@ -131,7 +131,10 @@ int init_lib_seshat(const char *url)
 {
     int timeout_val = 7001;
 
-    assert(url);
+    if( NULL == url ) {
+        LibSeshatError("init_lib_seshat: URL required!\n");
+        return -1;
+    }
 
     if (NULL != __current_url_) {
         if (0 == strcmp(url, __current_url_)) {
@@ -140,7 +143,7 @@ int init_lib_seshat(const char *url)
         }
 
         LibSeshatError("init_lib_seshat: Re-Init with different URL not allowed!\n");
-        return -1;
+        return -2;
     }
 
 
@@ -150,8 +153,8 @@ int init_lib_seshat(const char *url)
 
     if( 0 > __socket_handle_ ) {
         LibSeshatError("nn_socket returned failure (%d): %s\n", __socket_handle_, strerror(errno));
+        return -3;
     }
-    assert(__socket_handle_ >= 0);
 
     if (0 != nn_setsockopt (__socket_handle_, NN_SOL_SOCKET, NN_RCVTIMEO,
             &timeout_val, sizeof(timeout_val))) {
@@ -159,7 +162,7 @@ int init_lib_seshat(const char *url)
         __current_url_ = NULL;
         __socket_handle_ = -1;
         __end_point_     = -1;
-        return -1;
+        return -4;
     }
 
     __end_point_ = nn_connect(__socket_handle_, __current_url_);
@@ -169,7 +172,7 @@ int init_lib_seshat(const char *url)
         __current_url_ = NULL;
         __socket_handle_ = -1;
         __end_point_     = -1;
-        return -1;
+        return -5;
     }
 
     return 0;
