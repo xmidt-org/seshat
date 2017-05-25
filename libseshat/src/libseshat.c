@@ -164,7 +164,8 @@ int init_lib_seshat(const char *url)
             &timeout_val, sizeof(timeout_val))) {
         free(__current_url_);
         __current_url_ = NULL;
-        __socket_handle_ = -1;
+        nn_close(__socket_handle_);
+	__socket_handle_ = -1;
         __end_point_     = -1;
         return -4;
     }
