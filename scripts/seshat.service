@@ -2,8 +2,6 @@
 Description=Starts seshat service-discovery agent service
 
 [Service]
-Environment="LOG4C_RCPATH=/rdklogger"
-ExecStart=/usr/bin/seshat -u tcp://127.0.0.1:7777
 Restart=always
 RestartSec=5
 StandardOutput=syslog+console
