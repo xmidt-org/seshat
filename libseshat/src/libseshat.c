@@ -175,6 +175,7 @@ int init_lib_seshat(const char *url)
         nn_shutdown(__socket_handle_, 0);
         free(__current_url_);
         __current_url_ = NULL;
+        nn_close(__socket_handle_);
         __socket_handle_ = -1;
         __end_point_     = -1;
         return -5;
