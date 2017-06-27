@@ -210,12 +210,12 @@ char *discover_service_data(const char *service)
     memset(uuid_str, 0, UUID_STRING_SIZE);
     uuid_generate_time_safe(uuid);
     uuid_unparse_lower(uuid, uuid_str);
-    LibSeshatInfo("discover_service_data() uuid string: %s\n", uuid_str);   
+    LibSeshatPrint("discover_service_data() uuid string: %s\n", uuid_str);   
     if (send_message(WRP_MSG_TYPE__RETREIVE, service,
                      (const char *) NULL, uuid_str))
     {
         wrp_msg_t *msg = NULL;
-        LibSeshatInfo("discover_service_data() waiting ...\n");
+        LibSeshatPrint("discover_service_data() waiting ...\n");
         if (0 == wait_for_reply(&msg, uuid_str)) {   
             LibSeshatInfo("discover_service_data() status %d, type %d\n", msg->u.crud.status, msg->msg_type);
             if (WRP_MSG_TYPE__RETREIVE == msg->msg_type && 
@@ -299,7 +299,7 @@ bool send_message(int wrp_request, const char *service,
     }
     
     if ((bytes_sent =  nn_send(__socket_handle_, payload_bytes, payload_size, 0)) > 0) {
-        LibSeshatInfo("libseshat: Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) payload_size);
+        LibSeshatPrint("libseshat: Sent %d bytes (size of struct %d)\n", bytes_sent, (int ) payload_size);
     }
 
     free(payload_bytes);
@@ -335,17 +335,17 @@ int wait_for_reply(wrp_msg_t **msg, char *uuid_str)
     }
  
     if (NULL == uuid_str) {
-        LibSeshatInfo("wait_for_reply(): No UUID Required, passed.\n");
+        LibSeshatPrint("wait_for_reply(): No UUID Required, passed.\n");
         return 0;
     }
 
-    LibSeshatInfo("wait_for_reply() transaction_uuid %s, type %d",
+    LibSeshatPrint("wait_for_reply() transaction_uuid %s, type %d",
            (*msg)->u.crud.transaction_uuid, (*msg)->msg_type);
     
     if ((*msg)->u.crud.transaction_uuid && 
         (*msg)->u.crud.transaction_uuid[0] && 
         (0 == strcmp(uuid_str, (*msg)->u.crud.transaction_uuid))) {
-        LibSeshatInfo("wait_for_reply() Valid UUID\n");
+        LibSeshatPrint("wait_for_reply() Valid UUID\n");
         return 0;
     } else {
         wrp_free_struct(*msg);
