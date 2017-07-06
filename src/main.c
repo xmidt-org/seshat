@@ -143,7 +143,7 @@ int main( int argc, char **argv)
 	static int cnt = 0;
         
 	if (0 == cnt++ % 5) {
-        	SeshatInfo("main() waiting ...lifetime %d, passed_time %d\n",
+        	SeshatPrint("main() waiting ...lifetime %d, passed_time %d\n",
  	               (int ) lifetime, time_passed);
 	}
         sleep(5);
