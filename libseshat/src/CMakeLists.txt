@@ -23,6 +23,14 @@ set_target_properties(${PROJ_LIBSESHAT}.shared PROPERTIES OUTPUT_NAME ${PROJ_LIB
 set_property(TARGET ${PROJ_LIBSESHAT} PROPERTY C_STANDARD 99)
 set_property(TARGET ${PROJ_LIBSESHAT}.shared PROPERTY C_STANDARD 99)
 
+# ----------------------------------------------------------------------------
+# Note: This is a partial solution and only covers the case required for the
+# Yocto build (ie dynamic lib). Other cases may need fixing too.
+# ----------------------------------------------------------------------------
+if (BUILD_YOCTO)
+target_link_libraries(${PROJ_LIBSESHAT}.shared m log4c rdkloggers cjson cimplog nanomsg wrp-c msgpackc trower-base64)
+endif (BUILD_YOCTO)
+
 install (TARGETS ${PROJ_LIBSESHAT} DESTINATION lib${LIB_SUFFIX})
 install (TARGETS ${PROJ_LIBSESHAT}.shared DESTINATION lib${LIB_SUFFIX})
 install (FILES libseshat.h DESTINATION include/${PROJ_LIBSESHAT})
