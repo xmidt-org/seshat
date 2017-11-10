@@ -113,7 +113,7 @@ void test_wi_create_response_to_message_ret()
         CU_ASSERT(tests[i].r.u.crud.status == msg->u.crud.status);
         CU_ASSERT(tests[i].r.u.crud.rdr == msg->u.crud.rdr);
         CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.path, msg->u.crud.path);
-        CU_ASSERT_STRING_EQUAL(tests[i].r.u.crud.payload, msg->u.crud.payload);
+        CU_ASSERT(0 == memcmp(tests[i].r.u.crud.payload, msg->u.crud.payload, msg->u.crud.payload_size));
         wrp_free_struct(msg);
         free(bytes);
     }
