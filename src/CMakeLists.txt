@@ -29,8 +29,10 @@ target_link_libraries (seshat
     -lnanomsg
     -lcjson
     -lpthread
-    -lrt
     )
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+target_link_libraries (seshat rt)
+endif()
 install (TARGETS seshat DESTINATION bin)
 
 target_link_libraries (fake_server
@@ -43,5 +45,7 @@ target_link_libraries (fake_server
     -lnanomsg
     -lcjson
     -lpthread
-    -lrt
     )
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+target_link_libraries (fake_server rt)
+endif()

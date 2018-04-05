@@ -23,8 +23,10 @@ add_test(NAME test_json_interface COMMAND test_json_interface)
 add_executable(test_json_interface test_json_interface.c ../src/json_interface.c)
 set_property(TARGET test_json_interface PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_json_interface -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lrt -lnanomsg)
-target_link_libraries (test_json_interface gcov)
+target_link_libraries (test_json_interface -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lnanomsg)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+target_link_libraries (test_json_interface gcov -lrt)
+endif()
 target_link_libraries (test_json_interface cunit)
 
 #-------------------------------------------------------------------------------
@@ -34,8 +36,10 @@ add_test(NAME test_wrp_interface_CRM_reg COMMAND test_wrp_interface_CRM_reg)
 add_executable(test_wrp_interface_CRM_reg test_wrp_interface_CRM_reg.c ../src/wrp_interface.c)
 set_property(TARGET test_wrp_interface_CRM_reg PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_wrp_interface_CRM_reg -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lrt -lnanomsg)
-target_link_libraries (test_wrp_interface_CRM_reg gcov)
+target_link_libraries (test_wrp_interface_CRM_reg -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lnanomsg)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+target_link_libraries (test_wrp_interface_CRM_reg gcov -lrt)
+endif()
 target_link_libraries (test_wrp_interface_CRM_reg cunit)
 
 #-------------------------------------------------------------------------------
@@ -45,8 +49,10 @@ add_test(NAME test_wrp_interface_CRM_ret COMMAND test_wrp_interface_CRM_ret)
 add_executable(test_wrp_interface_CRM_ret test_wrp_interface_CRM_ret.c ../src/wrp_interface.c)
 set_property(TARGET test_wrp_interface_CRM_ret PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_wrp_interface_CRM_ret -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lrt -lnanomsg)
-target_link_libraries (test_wrp_interface_CRM_ret gcov)
+target_link_libraries (test_wrp_interface_CRM_ret -lpthread -lwrp-c -lmsgpackc -ltrower-base64 -lcjson -lcimplog -lnanomsg)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+target_link_libraries (test_wrp_interface_CRM_ret gcov -lrt)
+endif()
 target_link_libraries (test_wrp_interface_CRM_ret cunit)
 
 add_custom_target(coverage
