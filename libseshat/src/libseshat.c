@@ -208,7 +208,11 @@ char *discover_service_data(const char *service)
     
     uuid_str = (char *) malloc(UUID_STRING_SIZE);
     memset(uuid_str, 0, UUID_STRING_SIZE);
+#ifdef __MACH__
+    uuid_generate_time(uuid);
+#elif // __MACH__
     uuid_generate_time_safe(uuid);
+#endif // __MACH__
     uuid_unparse_lower(uuid, uuid_str);
     LibSeshatPrint("discover_service_data() uuid string: %s\n", uuid_str);   
     if (send_message(WRP_MSG_TYPE__RETREIVE, service,

@@ -51,6 +51,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE -DNOPOLL_LOGGER ")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Werror -Wall -Wno-missing-field-initializers")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall")
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(CMAKE_MACOSX_RPATH 1)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+endif()
 
 # pthread external dependency
 #-------------------------------------------------------------------------------
@@ -91,6 +95,9 @@ ExternalProject_Add(cJSON
     GIT_REPOSITORY https://github.com/DaveGamble/cJSON.git
     GIT_TAG "aafb64a1c549b7b927e339df6d35b1d5059dc235"
     CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DBUILD_TESTING=OFF
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    CMAKE_ARGS += -DCMAKE_MACOSX_RPATH=true
+endif()
 )
 add_library(libcJSON STATIC SHARED IMPORTED)
 add_dependencies(libcJSON cJSON)
@@ -126,7 +133,7 @@ add_dependencies(libcimplog cimplog)
 # wrp-c external dependency
 #-------------------------------------------------------------------------------
 ExternalProject_Add(wrp-c
-	DEPENDS msgpack cimplog
+	DEPENDS trower-base64 msgpack cimplog
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/wrp-c
     GIT_REPOSITORY https://github.com/Comcast/wrp-c.git
     GIT_TAG "d42ac3a63b8d6e723995b63e23aa1969e622faa5"
