@@ -210,7 +210,7 @@ char *discover_service_data(const char *service)
     memset(uuid_str, 0, UUID_STRING_SIZE);
 #ifdef __MACH__
     uuid_generate_time(uuid);
-#elif // __MACH__
+#else // __MACH__
     uuid_generate_time_safe(uuid);
 #endif // __MACH__
     uuid_unparse_lower(uuid, uuid_str);
