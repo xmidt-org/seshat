@@ -22,8 +22,8 @@
 #include <signal.h>
 #include <assert.h>
 #include <getopt.h>
-#include <nanomsg/nn.h>
-#include <nanomsg/pipeline.h>
+#include <nng/compat/nanomsg/nn.h>
+#include <nng/compat/nanomsg/pipeline.h>
 #include <time.h>
 #include <wrp-c/wrp-c.h>
 #include "nmsg.h"

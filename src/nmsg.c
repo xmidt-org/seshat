@@ -20,9 +20,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include <nanomsg/nn.h>
-#include <nanomsg/pipeline.h>
 #include "nmsg.h"
+#include <nng/compat/nanomsg/pipeline.h>
 #include "seshat_log.h"
 
 #define SOCK_SEND_TIMEOUT_MS 2000

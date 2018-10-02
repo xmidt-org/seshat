@@ -26,7 +26,7 @@ target_link_libraries (seshat
     -ltrower-base64
     -lm
     -lcimplog
-    -lnanomsg
+    -lnng
     -lcjson
     -lpthread
     )
@@ -42,7 +42,7 @@ target_link_libraries (fake_server
     -ltrower-base64
     -lm
     -lcimplog
-    -lnanomsg
+    -lnng
     -lcjson
     -lpthread
     )
