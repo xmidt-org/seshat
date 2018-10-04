@@ -27,7 +27,8 @@ add_test(NAME seshat_e2e_test COMMAND simple_test)
 add_executable(simple_test simple.c ../src/libseshat.c)
 set_property(TARGET simple_test PROPERTY C_STANDARD 99)
 
-target_link_libraries (simple_test ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS} -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -lcimplog)
+target_link_libraries (simple_test ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS}
+ -lwrp-c -lmsgpackc -ltrower-base64 -lnng -lcimplog -lpthread)
 
 #-------------------------------------------------------------------------------
 #   test_init_lib_seshat_failure-3
@@ -36,7 +37,8 @@ add_test(NAME test_init_lib_seshat_failure-3 COMMAND test_init_lib_seshat_failur
 add_executable(test_init_lib_seshat_failure-3 test_init_lib_seshat_failure-3.c ../src/libseshat.c)
 set_property(TARGET test_init_lib_seshat_failure-3 PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_init_lib_seshat_failure-3 ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS} -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -lcimplog)
+target_link_libraries (test_init_lib_seshat_failure-3 ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS}
+ -lwrp-c -lmsgpackc -ltrower-base64 -lcimplog -lpthread)
 
 #-------------------------------------------------------------------------------
 #   test_init_lib_seshat_failure-4
@@ -45,7 +47,8 @@ add_test(NAME test_init_lib_seshat_failure-4 COMMAND test_init_lib_seshat_failur
 add_executable(test_init_lib_seshat_failure-4 test_init_lib_seshat_failure-4.c ../src/libseshat.c)
 set_property(TARGET test_init_lib_seshat_failure-4 PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_init_lib_seshat_failure-4 ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS} -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -lcimplog)
+target_link_libraries (test_init_lib_seshat_failure-4 ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS}
+ -lwrp-c -lmsgpackc -ltrower-base64 -lcimplog -lpthread)
 
 #-------------------------------------------------------------------------------
 #   test_init_lib_seshat_failure-5
@@ -54,5 +57,6 @@ add_test(NAME test_init_lib_seshat_failure-5 COMMAND test_init_lib_seshat_failur
 add_executable(test_init_lib_seshat_failure-5 test_init_lib_seshat_failure-5.c ../src/libseshat.c)
 set_property(TARGET test_init_lib_seshat_failure-5 PROPERTY C_STANDARD 99)
 
-target_link_libraries (test_init_lib_seshat_failure-5 ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS} -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -lcimplog)
+target_link_libraries (test_init_lib_seshat_failure-5 ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS}
+ -lwrp-c -lmsgpackc -ltrower-base64 -lcimplog -lpthread)
 

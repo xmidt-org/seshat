@@ -29,11 +29,54 @@
 /*----------------------------------------------------------------------------*/
 #define UNUSED(x) (void)(x)
 
+int nn_socket (int domain, int protocol)
+{
+    UNUSED(domain); UNUSED(protocol);
+    return 100;
+}
+
+int nn_shutdown (int s, int how)
+{
+    UNUSED(s); UNUSED(how);
+    return 0;
+}
+
 int nn_setsockopt (int s, int level, int option, const void *optval, size_t optvallen)
 {
     UNUSED(s); UNUSED(level); UNUSED(option); UNUSED(optval); UNUSED(optvallen);
     return -1;
 }
+
+int nn_close (int s)
+{
+    UNUSED(s);
+    return 0;
+}
+
+int nn_connect (int s, const char *addr)
+{
+    UNUSED(s); UNUSED(addr);
+    return 0;
+}
+
+int nn_send (int s, const void *buf, size_t len, int flags)
+{
+    UNUSED(s); UNUSED(buf); UNUSED(len); UNUSED(flags);
+    return 1;
+}
+
+int nn_recv (int s, void *buf, size_t len, int flags)
+{
+    UNUSED(s); UNUSED(buf); UNUSED(len); UNUSED(flags);
+    return 1;
+}
+
+int nn_freemsg (void *msg)
+{
+    UNUSED(msg);
+    return 0;
+}
+
 
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
