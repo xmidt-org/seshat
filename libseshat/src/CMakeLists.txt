@@ -28,7 +28,8 @@ set_property(TARGET ${PROJ_LIBSESHAT}.shared PROPERTY C_STANDARD 99)
 # Yocto build (ie dynamic lib). Other cases may need fixing too.
 # ----------------------------------------------------------------------------
 if (BUILD_YOCTO)
-target_link_libraries(${PROJ_LIBSESHAT}.shared m log4c rdkloggers cjson cimplog nng wrp-c msgpackc trower-base64)
+target_link_libraries(${PROJ_LIBSESHAT}.shared m log4c rdkloggers 
+  cjson cimplog nanomsg wrp-c msgpackc trower-base64)
 endif (BUILD_YOCTO)
 
 install (TARGETS ${PROJ_LIBSESHAT} DESTINATION lib${LIB_SUFFIX})

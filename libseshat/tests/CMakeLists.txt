@@ -28,7 +28,7 @@ add_executable(simple_test simple.c ../src/libseshat.c)
 set_property(TARGET simple_test PROPERTY C_STANDARD 99)
 
 target_link_libraries (simple_test ${LIBSESHAT_LINUX_ONLY_LIBS} ${LIBSESHAT_COMMON_LIBS}
- -lwrp-c -lmsgpackc -ltrower-base64 -lnng -lcimplog -lpthread)
+ -lwrp-c -lmsgpackc -ltrower-base64 -lnanomsg -lcimplog -lpthread)
 
 #-------------------------------------------------------------------------------
 #   test_init_lib_seshat_failure-3
