@@ -23,9 +23,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
-#include <nng/compat/nanomsg/nn.h>
-#include <nng/compat/nanomsg/pipeline.h>
-#include <nng/compat/nanomsg/reqrep.h>
+#include <nanomsg/nn.h>
+#include <nanomsg/pipeline.h>
+#include <nanomsg/reqrep.h>
 #include <uuid/uuid.h> // Fedora build requires "libuuid-devel"
 #include "libseshat.h"
 
